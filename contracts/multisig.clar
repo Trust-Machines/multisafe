@@ -155,7 +155,15 @@
 
 
 ;; init
-(add-owner-internal 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)
-(add-owner-internal 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG)
-(add-owner-internal 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC)
-(set-min-confirmation-internal u2)
+(define-private (init (o (list 50 principal)) (m uint))
+    (begin
+        (map add-owner-internal o)
+        (set-min-confirmation-internal u2)
+    )
+)
+
+(init (list 
+    'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 
+    'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG 
+    'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC
+) u2)
