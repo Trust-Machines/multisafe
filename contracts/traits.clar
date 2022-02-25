@@ -6,7 +6,7 @@
 	)
 )
 
-(define-trait tx-trait
+(define-trait executor-trait
 	(
 		(execute (<wallet-trait>) (response bool uint))
 	)

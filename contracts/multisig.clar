@@ -1,6 +1,6 @@
 ;; A multi-signature wallet prototype
 
-(use-trait tx-trait .traits.tx-trait)
+(use-trait executor-trait .traits.executor-trait)
 (use-trait wallet-trait .traits.wallet-trait)
 
 (impl-trait .traits.wallet-trait)
@@ -92,7 +92,7 @@
     }
 )
 
-(define-private (add-transaction (destination <tx-trait>))
+(define-private (add-transaction (destination <executor-trait>))
     (let 
         (
             (tx-id (get-nonce))
@@ -111,7 +111,7 @@
     (map get-transaction-by-id tx-ids)
 )
 
-(define-public (confirm-transaction (tx-id uint) (destination <tx-trait>) (wallet <wallet-trait>))
+(define-public (confirm-transaction (tx-id uint) (destination <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
@@ -141,7 +141,7 @@
     )
 )
 
-(define-public (submit-transaction (destination <tx-trait>) (wallet <wallet-trait>))
+(define-public (submit-transaction (destination <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
