@@ -3,8 +3,8 @@ name = "multisig-wallet"
 requirements = []
 costs_version = 1
 
-[contracts.multisig]
-path = "contracts/multisig.clar"
+[contracts.wallet]
+path = "contracts/wallet.clar"
 depends_on = ["traits"]
 
 [contracts.traits]
@@ -13,19 +13,19 @@ depends_on = []
 
 [contracts.add-owner]
 path = "contracts/executors/add-owner.clar"
-depends_on = ["multisig"]
+depends_on = ["wallet"]
 
 [contracts.remove-owner]
 path = "contracts/executors/remove-owner.clar"
-depends_on = ["multisig"]
+depends_on = ["wallet"]
 
 [contracts.set-min-confirmation]
 path = "contracts/executors/set-min-confirmation.clar"
-depends_on = ["multisig"]
+depends_on = ["wallet"]
 
 [contracts.transfer-stx]
 path = "contracts/executors/transfer-stx.clar"
-depends_on = ["multisig"]
+depends_on = ["wallet"]
 
 [contracts.vault]
 path = "contracts/helpers/vault.clar"
@@ -33,4 +33,4 @@ depends_on = []
 
 [contracts.set-vault-token-per-cycle]
 path = "contracts/executors/set-vault-token-per-cycle.clar"
-depends_on = ["multisig", "vault"]
+depends_on = ["wallet", "vault"]

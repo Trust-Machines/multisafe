@@ -24,7 +24,7 @@ Before getting started please make sure you have [Clarinet](https://docs.hiro.so
 
 If you are not familiar with Clarinet [this tutorial](https://www.youtube.com/watch?v=zERDftjl6k8) can help you.
 
-By default three owners added to multi-signature wallet and default minimum confirmation requirement is two. See in the ending of [multisig.clar](contracts/multisig.clar):
+By default three owners added to multi-signature wallet and default minimum confirmation requirement is two. See in the ending of [wallet.clar](contracts/wallet.clar):
 
 ```
 (add-owner-internal 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5)
@@ -35,7 +35,7 @@ By default three owners added to multi-signature wallet and default minimum conf
 
 ## Testing
 
-There are several tests in the tests/multisig_tests.ts
+There are several tests in the tests/wallet_tests.ts
 
 Run ```clarinet test``` to see test results.
 
@@ -61,14 +61,14 @@ To simulate this example we'll use [set-vault-token-per-cycle](contracts/templat
 **3- Switch to the first owner and start transaction with `set-vault-token-per-cycle` template**
 `::set_tx_sender ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5`
 
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle)`
 
 > (ok u0) <small>the number next to ok is the new transaction id.</small>
 
 **4- Confirm the transaction with the second owner**
 `::set_tx_sender ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG`
 
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle)```
 
 > (ok true) <small>"true" means that the transaction has been received enough confirmations and executed.</small>
 
@@ -88,17 +88,17 @@ We'll use [transfer-stx](contracts/templates/transfer-stx.clar) template to simu
 **1- Switch to the third owner and send some STX to multi-signature contract to simulate this example**
 `::set_tx_sender ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC`
 
-`(stx-transfer? u50000000 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig)`
+`(stx-transfer? u50000000 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet)`
 
 **2- Start transaction with `transfer-stx` template**
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx)`
 
 > (ok u0)
 
 **2- Confirm the transaction with the second owner**
 `::set_tx_sender ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG`
 
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx)```
 
 > (ok true)
 
@@ -115,7 +115,7 @@ Following functions can be executed by only the multi-signature contract and req
 #### Adding a new owner
 
 **1- See all owners of the wallet**
-```(contract-call? .multisig get-owners)```
+```(contract-call? .wallet get-owners)```
 
 >[ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC]
 
@@ -123,7 +123,7 @@ Following functions can be executed by only the multi-signature contract and req
 `::set_tx_sender ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5`
 
 **3- Submit a new transaction with 'add-owner' template**
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner)`
 
 >(ok u0)
 
@@ -131,12 +131,12 @@ Following functions can be executed by only the multi-signature contract and req
 ```::set_tx_sender ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC```
 
 **5- Confirm the transaction** 
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner)```
 
 > (ok true) 
 
 **6- See the new owner added**
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig get-owners)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet get-owners)```
 
 >[ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC, ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND]
 
@@ -148,19 +148,19 @@ Following functions can be executed by only the multi-signature contract and req
 `::set_tx_sender ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG`
 
 **2- Submit a new transaction with 'remove-owner' template**
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner)`
 
 >(ok u0)
 
 **3- Switch to the third owner and confirm the transaction** 
 ```::set_tx_sender ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC```
 
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner)```
 
 > (ok true) 
 
 **5- See the owner removed**
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig get-owners)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet get-owners)```
 
 >[ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC]
 
@@ -169,7 +169,7 @@ Following functions can be executed by only the multi-signature contract and req
 #### Updating minimum confirmation requirement
 
 **1- See current requirement**
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig get-min-confirmation)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet get-min-confirmation)```
 
 >u2
 
@@ -177,19 +177,19 @@ Following functions can be executed by only the multi-signature contract and req
 
 `::set_tx_sender ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5`
 
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation)`
 
 >(ok u0)
 
 **3- Switch to the first owner and confirm the transaction**
 `::set_tx_sender ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG`
 
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation)```
 
 > (ok true)
 
 **4- See the minimum confirmation requirement updated**
-```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig get-min-confirmation)```
+```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet get-min-confirmation)```
 
 > u3
 
