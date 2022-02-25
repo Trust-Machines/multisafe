@@ -92,7 +92,7 @@
     }
 )
 
-(define-private (add-transaction (executor <executor-trait>))
+(define-private (add (executor <executor-trait>))
     (let 
         (
             (tx-id (get-nonce))
@@ -146,7 +146,7 @@
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
         (let
-            ((tx-id (add-transaction executor)))
+            ((tx-id (add executor)))
             (unwrap-panic (confirm-transaction tx-id executor wallet))
             (ok tx-id)
         )
