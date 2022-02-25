@@ -12,19 +12,19 @@ path = "contracts/traits.clar"
 depends_on = []
 
 [contracts.add-owner]
-path = "contracts/templates/add-owner.clar"
+path = "contracts/executors/add-owner.clar"
 depends_on = ["multisig"]
 
 [contracts.remove-owner]
-path = "contracts/templates/remove-owner.clar"
+path = "contracts/executors/remove-owner.clar"
 depends_on = ["multisig"]
 
 [contracts.set-min-confirmation]
-path = "contracts/templates/set-min-confirmation.clar"
+path = "contracts/executors/set-min-confirmation.clar"
 depends_on = ["multisig"]
 
 [contracts.transfer-stx]
-path = "contracts/templates/transfer-stx.clar"
+path = "contracts/executors/transfer-stx.clar"
 depends_on = ["multisig"]
 
 [contracts.vault]
@@ -32,5 +32,5 @@ path = "contracts/helpers/vault.clar"
 depends_on = []
 
 [contracts.set-vault-token-per-cycle]
-path = "contracts/templates/set-vault-token-per-cycle.clar"
+path = "contracts/executors/set-vault-token-per-cycle.clar"
 depends_on = ["multisig", "vault"]
