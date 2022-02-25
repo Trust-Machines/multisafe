@@ -12,7 +12,7 @@
 (define-constant err-tx-unauthorized-sender (err u130))
 (define-constant err-tx-not-found (err u140))
 (define-constant err-tx-already-confirmed (err u150))
-(define-constant err-tx-invalid-destination (err u160))
+(define-constant err-tx-invalid-executor (err u160))
 (define-constant err-tx-invalid-wallet (err u170))
 
 
@@ -122,7 +122,7 @@
             )
 
             (asserts! (is-none (index-of confirmations tx-sender)) err-tx-already-confirmed)
-            (asserts! (is-eq (get executor tx) (contract-of executor)) err-tx-invalid-destination)
+            (asserts! (is-eq (get executor tx) (contract-of executor)) err-tx-invalid-executor)
             
             (let 
                 (
