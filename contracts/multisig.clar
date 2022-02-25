@@ -107,7 +107,7 @@
     (unwrap-panic (map-get? transactions tx-id))
 )
 
-(define-read-only (get-transactions-by-ids (tx-ids (list 20 uint)))
+(define-read-only (get-transactions (tx-ids (list 20 uint)))
     (map get-transaction tx-ids)
 )
 

@@ -526,7 +526,7 @@ Clarinet.test({
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "get-transactions-by-ids",
+                "get-transactions",
                 [types.list([types.uint(0), types.uint(1), types.uint(2), types.uint(3) , types.uint(4)])],
                 WALLETS[0]
               ),
