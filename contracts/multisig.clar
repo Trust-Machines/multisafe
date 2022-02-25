@@ -1,6 +1,9 @@
 ;; A multi-signature wallet prototype
 
 (use-trait tx-trait .traits.tx-trait)
+(use-trait wallet-trait .traits.wallet-trait)
+
+(impl-trait .traits.wallet-trait)
 
 ;; errors
 (define-constant err-caller-must-be-self (err u100))
@@ -10,6 +13,7 @@
 (define-constant err-tx-not-found (err u140))
 (define-constant err-tx-already-confirmed (err u150))
 (define-constant err-tx-invalid-destination (err u160))
+(define-constant err-tx-invalid-wallet (err u170))
 
 
 ;; principal of the deployed contract
@@ -107,9 +111,10 @@
     (map get-transaction-by-id tx-ids)
 )
 
-(define-public (confirm-transaction (tx-id uint) (destination <tx-trait>))
+(define-public (confirm-transaction (tx-id uint) (destination <tx-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
+        (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
         (let
             (
                 (tx (unwrap! (map-get? transactions tx-id) err-tx-not-found))
@@ -127,7 +132,7 @@
                 )
                 (map-set transactions tx-id new-tx)
                 (if confirmed 
-                    (try! (as-contract (contract-call? destination execute)))
+                    (try! (as-contract (contract-call? destination execute wallet)))
                     false
                 )
                 (ok confirmed)
@@ -136,12 +141,13 @@
     )
 )
 
-(define-public (submit-transaction (destination <tx-trait>))
+(define-public (submit-transaction (destination <tx-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
+        (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
         (let
             ((tx-id (add-transaction destination)))
-            (unwrap-panic (confirm-transaction tx-id destination))
+            (unwrap-panic (confirm-transaction tx-id destination wallet))
             (ok tx-id)
         )
     )

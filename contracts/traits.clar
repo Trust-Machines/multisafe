@@ -1,5 +1,14 @@
-(define-trait tx-trait
+(define-trait wallet-trait
 	(
-		(execute () (response bool uint))
+		(add-owner (principal) (response bool uint))
+		(remove-owner (principal) (response bool uint))
+		(set-min-confirmation (uint) (response bool uint))
 	)
 )
+
+(define-trait tx-trait
+	(
+		(execute (<wallet-trait>) (response bool uint))
+	)
+)
+

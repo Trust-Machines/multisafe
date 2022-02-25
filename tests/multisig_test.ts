@@ -71,7 +71,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[3]
               ),
         ]);
@@ -81,7 +84,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(0), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner")],
+                [
+                    types.uint(0), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[3]
               ),
         ]);
@@ -114,7 +121,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[0]
               ),
         ]);
@@ -142,7 +152,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(0), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner")],
+                [
+                    types.uint(0), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[0]
               ),
         ]);
@@ -153,7 +167,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(0), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner")],
+                [
+                    types.uint(0),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -164,7 +182,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(0), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner")],
+                [
+                    types.uint(0), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -235,7 +257,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[0]
               ),
         ]);
@@ -246,7 +271,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(1), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation")],
+                [
+                    types.uint(1),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -275,7 +304,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[3]
               ),
         ]);
@@ -286,7 +318,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(2), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner")],
+                [
+                    types.uint(2),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -297,7 +333,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(2), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner")],
+                [
+                    types.uint(2), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[2]
               ),
         ]);
@@ -347,7 +387,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -358,7 +401,11 @@ Clarinet.test({
         Tx.contractCall(
             "multisig",
             "confirm-transaction",
-            [types.uint(3), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx")],
+            [
+                types.uint(3), 
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+            ],
             WALLETS[2]
           ), 
         ]);
@@ -369,7 +416,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(3), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx")],
+                [
+                    types.uint(3),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[3]
             ),
         ]);
@@ -416,7 +467,10 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "submit-transaction",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle")],
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[1]
               ),
         ]);
@@ -427,7 +481,11 @@ Clarinet.test({
         Tx.contractCall(
             "multisig",
             "confirm-transaction",
-            [types.uint(4), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle")],
+            [
+                types.uint(4), 
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+            ],
             WALLETS[2]
           ), 
         ]);
@@ -438,7 +496,11 @@ Clarinet.test({
             Tx.contractCall(
                 "multisig",
                 "confirm-transaction",
-                [types.uint(4), types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle")],
+                [
+                    types.uint(4), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
+                ],
                 WALLETS[3]
             ),
         ]);
