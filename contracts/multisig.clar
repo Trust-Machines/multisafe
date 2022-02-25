@@ -141,7 +141,7 @@
     )
 )
 
-(define-public (submit-transaction (executor <executor-trait>) (wallet <wallet-trait>))
+(define-public (submit (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 

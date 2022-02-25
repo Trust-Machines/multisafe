@@ -70,7 +70,7 @@ Clarinet.test({
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
@@ -120,7 +120,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
@@ -256,7 +256,7 @@ Clarinet.test({
          block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
@@ -303,7 +303,7 @@ Clarinet.test({
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
@@ -386,7 +386,7 @@ Clarinet.test({
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
@@ -466,7 +466,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "submit-transaction",
+                "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig")
