@@ -192,3 +192,4 @@ Following functions can be executed by only the multi-signature contract and req
 ```(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.multisig get-min-confirmation)```
 
 > u3
+
