@@ -134,7 +134,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "get-transaction-by-id",
+                "get-transaction",
                 [types.uint(0)],
                 WALLETS[0]
               ),
@@ -196,7 +196,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "get-transaction-by-id",
+                "get-transaction",
                 [types.uint(0)],
                 WALLETS[0]
               ),
@@ -347,7 +347,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "get-transaction-by-id",
+                "get-transaction",
                 [types.uint(2)],
                 WALLETS[0]
               ),

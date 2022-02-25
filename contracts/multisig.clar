@@ -103,12 +103,12 @@
     )
 )
 
-(define-read-only (get-transaction-by-id (tx-id uint))
+(define-read-only (get-transaction (tx-id uint))
     (unwrap-panic (map-get? transactions tx-id))
 )
 
 (define-read-only (get-transactions-by-ids (tx-ids (list 20 uint)))
-    (map get-transaction-by-id tx-ids)
+    (map get-transaction tx-ids)
 )
 
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
