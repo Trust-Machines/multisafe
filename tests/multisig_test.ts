@@ -83,7 +83,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
@@ -151,7 +151,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
@@ -166,7 +166,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(0),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
@@ -181,7 +181,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
@@ -270,7 +270,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(1),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
@@ -317,7 +317,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(2),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
@@ -332,7 +332,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(2), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
@@ -400,7 +400,7 @@ Clarinet.test({
        block = CHAIN.mineBlock([
         Tx.contractCall(
             "multisig",
-            "confirm-transaction",
+            "confirm",
             [
                 types.uint(3), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
@@ -415,7 +415,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(3),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
@@ -480,7 +480,7 @@ Clarinet.test({
        block = CHAIN.mineBlock([
         Tx.contractCall(
             "multisig",
-            "confirm-transaction",
+            "confirm",
             [
                 types.uint(4), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
@@ -495,7 +495,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "multisig",
-                "confirm-transaction",
+                "confirm",
                 [
                     types.uint(4), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),

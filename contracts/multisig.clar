@@ -111,7 +111,7 @@
     (map get-transaction-by-id tx-ids)
 )
 
-(define-public (confirm-transaction (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
+(define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
@@ -147,7 +147,7 @@
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
         (let
             ((tx-id (add executor)))
-            (unwrap-panic (confirm-transaction tx-id executor wallet))
+            (unwrap-panic (confirm tx-id executor wallet))
             (ok tx-id)
         )
     )
