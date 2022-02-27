@@ -1,4 +1,4 @@
-;; A multi-signature wallet prototype
+;; A multi-signature wallet
 
 (use-trait executor-trait .traits.executor-trait)
 (use-trait wallet-trait .traits.wallet-trait)

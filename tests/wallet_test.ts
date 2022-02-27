@@ -13,7 +13,7 @@ Clarinet.test({
         WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x+1}`)!.address);
         DEPLOYER = accounts.get('deployer')!.address
 
-        // send some stx to the multi-signature contract
+        // send some stx to the wallet contract
         CHAIN.mineBlock([
             Tx.transferSTX(
                 50000000,
@@ -387,7 +387,7 @@ Clarinet.test({
     name: "Spend STX",
     async fn() {
 
-        // Start a new transaction to send STX from the multi-signature wallet to another wallet
+        // Start a new transaction to send STX from the wallet to another account
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "wallet",
@@ -433,7 +433,7 @@ Clarinet.test({
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "true");      
         
-        // The transaction confirmed. STX balance of the multi-signature wallet should be 0.
+        // The transaction confirmed. STX balance of the wallet should be 0.
         const assetMap = CHAIN.getAssetsMaps();
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"], 0);
     },
@@ -443,7 +443,7 @@ Clarinet.test({
     name: "A vault ownership exmaple",
     async fn() {
 
-        // We have an imaginary vault contract and owner of the contract is the multi-signature wallet
+        // We have an imaginary vault contract and owner of the contract is the wallet
         // We want to update `token-per-cycle` by calling an owner only function `set-token-per-cycle`
 
         // Default token per cycle is u100
