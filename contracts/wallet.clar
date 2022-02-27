@@ -88,16 +88,18 @@
     {
         executor: principal,
         confirmations: (list 50 principal),
-        confirmed: bool
+        confirmed: bool,
+        arg-p: principal,
+        arg-u: uint
     }
 )
 
-(define-private (add (executor <executor-trait>))
+(define-private (add (executor <executor-trait>) (arg-p principal) (arg-u uint))
     (let 
         (
             (tx-id (get-nonce))
         ) 
-        (map-insert transactions tx-id {executor: (contract-of executor), confirmations: (list), confirmed: false})
+        (map-insert transactions tx-id {executor: (contract-of executor), confirmations: (list), confirmed: false, arg-p: arg-p, arg-u: arg-u})
         (increase-nonce)
         tx-id
     )
@@ -132,7 +134,7 @@
                 )
                 (map-set transactions tx-id new-tx)
                 (if confirmed 
-                    (try! (as-contract (contract-call? executor execute wallet)))
+                    (try! (as-contract (contract-call? executor execute wallet (get arg-p tx) (get arg-u tx))))
                     false
                 )
                 (ok confirmed)
@@ -141,12 +143,12 @@
     )
 )
 
-(define-public (submit (executor <executor-trait>) (wallet <wallet-trait>))
+(define-public (submit (executor <executor-trait>) (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
         (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
         (let
-            ((tx-id (add executor)))
+            ((tx-id (add executor arg-p arg-u)))
             (unwrap-panic (confirm tx-id executor wallet))
             (ok tx-id)
         )

@@ -73,7 +73,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND"),
+                    types.uint(0)
                 ],
                 WALLETS[3]
               ),
@@ -87,7 +89,7 @@ Clarinet.test({
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
                 ],
                 WALLETS[3]
               ),
@@ -95,7 +97,6 @@ Clarinet.test({
         assertEquals(block.receipts[0].result.expectErr(), "u130");      
     },
 });
-
 
 Clarinet.test({
     name: "Add a new owner",
@@ -123,7 +124,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal(WALLETS[3]),
+                    types.uint(0)
                 ],
                 WALLETS[0]
               ),
@@ -237,7 +240,6 @@ Clarinet.test({
     },
 });
 
-
 Clarinet.test({
     name: "Set minimum confirmation requirement",
     async fn() {
@@ -259,7 +261,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
+                    types.uint(3)
                 ],
                 WALLETS[0]
               ),
@@ -306,7 +310,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"),
+                    types.uint(0)
                 ],
                 WALLETS[3]
               ),
@@ -377,7 +383,6 @@ Clarinet.test({
     },
 });
 
-
 Clarinet.test({
     name: "Spend STX",
     async fn() {
@@ -389,7 +394,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
+                    types.uint(50000000)
                 ],
                 WALLETS[1]
               ),
@@ -432,7 +439,6 @@ Clarinet.test({
     },
 });
 
-
 Clarinet.test({
     name: "A vault ownership exmaple",
     async fn() {
@@ -469,7 +475,9 @@ Clarinet.test({
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
+                    types.uint(1200)
                 ],
                 WALLETS[1]
               ),

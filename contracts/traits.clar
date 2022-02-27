@@ -8,7 +8,7 @@
 
 (define-trait executor-trait
 	(
-		(execute (<wallet-trait>) (response bool uint))
+		(execute (<wallet-trait> principal uint) (response bool uint))
 	)
 )
 
