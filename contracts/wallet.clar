@@ -16,6 +16,13 @@
 (define-constant ERR-INVALID-WALLET (err u170))
 
 
+;; version
+(define-constant VERSION "0.0.1.alpha")
+
+(define-read-only (get-version)
+    VERSION
+)
+
 ;; principal of the deployed contract
 (define-data-var self principal (as-contract tx-sender))
 

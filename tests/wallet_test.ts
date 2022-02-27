@@ -543,3 +543,20 @@ Clarinet.test({
         assertEquals(block.receipts[0].result.expectList().length, 5); 
     },
 });
+
+
+Clarinet.test({
+    name: "Get version",
+    async fn() {
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "get-version",
+                [],
+                WALLETS[0]
+              ),
+        ]);
+       
+        assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
+    },
+});
