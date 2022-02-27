@@ -6,14 +6,14 @@
 (impl-trait .traits.wallet-trait)
 
 ;; errors
-(define-constant err-caller-must-be-self (err u100))
-(define-constant err-owner-already-exists (err u110))
-(define-constant err-owner-not-exists (err u120))
-(define-constant err-tx-unauthorized-sender (err u130))
-(define-constant err-tx-not-found (err u140))
-(define-constant err-tx-already-confirmed (err u150))
-(define-constant err-tx-invalid-executor (err u160))
-(define-constant err-tx-invalid-wallet (err u170))
+(define-constant ERR-CALLER-MUST-BE-SELF (err u100))
+(define-constant ERR-OWNER-ALREADY-EXISTS (err u110))
+(define-constant ERR-OWNER-NOT-EXISTS (err u120))
+(define-constant ERR-UNAUTHORIZED-SENDER (err u130))
+(define-constant ERR-TX-NOT-FOUND (err u140))
+(define-constant ERR-TX-ALREADY-CONFIRMED (err u150))
+(define-constant ERR-TX-INVALID-EXECUTOR (err u160))
+(define-constant ERR-INVALID-WALLET (err u170))
 
 
 ;; principal of the deployed contract
@@ -33,8 +33,8 @@
 
 (define-public (add-owner (owner principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) err-caller-must-be-self)
-        (asserts! (is-none (index-of (var-get owners) owner)) err-owner-already-exists)
+        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF)
+        (asserts! (is-none (index-of (var-get owners) owner)) ERR-OWNER-ALREADY-EXISTS)
         (ok (add-owner-internal owner))
     )
 )
@@ -45,8 +45,8 @@
 
 (define-public (remove-owner (owner principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) err-caller-must-be-self)
-        (asserts! (not ( is-none (index-of (var-get owners) owner) )) err-owner-not-exists)
+        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF)
+        (asserts! (not ( is-none (index-of (var-get owners) owner) )) ERR-OWNER-NOT-EXISTS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter (var-get owners)) u50))))
     )
@@ -66,7 +66,7 @@
 
 (define-public (set-min-confirmation (value uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) err-caller-must-be-self) 
+        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF) 
         (ok (set-min-confirmation-internal value))
     )
 )
@@ -115,16 +115,16 @@
 
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
-        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
-        (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
+        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) ERR-UNAUTHORIZED-SENDER)
+        (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
         (let
             (
-                (tx (unwrap! (map-get? transactions tx-id) err-tx-not-found))
+                (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
                 (confirmations (get confirmations tx))
             )
 
-            (asserts! (is-none (index-of confirmations tx-sender)) err-tx-already-confirmed)
-            (asserts! (is-eq (get executor tx) (contract-of executor)) err-tx-invalid-executor)
+            (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED)
+            (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
             
             (let 
                 (
@@ -145,8 +145,8 @@
 
 (define-public (submit (executor <executor-trait>) (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
     (begin
-        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) err-tx-unauthorized-sender)
-        (asserts! (is-eq (contract-of wallet) (var-get self)) err-tx-invalid-wallet) 
+        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) ERR-UNAUTHORIZED-SENDER)
+        (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
         (let
             ((tx-id (add executor arg-p arg-u)))
             (unwrap-panic (confirm tx-id executor wallet))
