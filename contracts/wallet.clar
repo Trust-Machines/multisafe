@@ -11,10 +11,11 @@
 (define-constant ERR-OWNER-NOT-EXISTS (err u120))
 (define-constant ERR-UNAUTHORIZED-SENDER (err u130))
 (define-constant ERR-TX-NOT-FOUND (err u140))
-(define-constant ERR-TX-ALREADY-CONFIRMED (err u150))
+(define-constant ERR-TX-ALREADY-CONFIRMED-BY-OWNER (err u150))
 (define-constant ERR-TX-INVALID-EXECUTOR (err u160))
 (define-constant ERR-INVALID-WALLET (err u170))
-
+(define-constant ERR-TX-CONFIRMED (err u180))
+(define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 
 ;; version
 (define-constant VERSION "0.0.1.alpha")
@@ -120,6 +121,30 @@
     (map get-transaction tx-ids)
 )
 
+(define-data-var rem-confirmation principal tx-sender)
+
+(define-private (remove-confirmation-filter (o principal)) (not (is-eq o (var-get rem-confirmation))))
+
+(define-public (revoke (tx-id uint))
+    (let 
+        (
+            (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
+            (confirmations (get confirmations tx))
+        )
+        (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
+        (asserts! (not (is-none (index-of confirmations tx-sender))) ERR-TX-NOT-CONFIRMED-BY-SENDER)
+        (var-set rem-confirmation tx-sender)
+        (let 
+            (
+                (new-confirmations  (unwrap-panic (as-max-len? (filter remove-confirmation-filter confirmations) u50)))
+                (new-tx (merge tx {confirmations: new-confirmations}))
+            )
+            (map-set transactions tx-id new-tx)
+            (ok true)
+        )
+    )
+)
+
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (not (is-none (index-of (var-get owners) tx-sender))) ERR-UNAUTHORIZED-SENDER)
@@ -130,7 +155,7 @@
                 (confirmations (get confirmations tx))
             )
 
-            (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED)
+            (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
             
             (let 

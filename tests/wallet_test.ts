@@ -6,6 +6,7 @@ let CHAIN: Chain;
 let WALLETS:string[] = [];
 let DEPLOYER: string = "";
 
+
 Clarinet.test({
     name: "Setup",
     async fn(chain: Chain, accounts: Map<string, Account>) {
@@ -97,6 +98,7 @@ Clarinet.test({
         assertEquals(block.receipts[0].result.expectErr(), "u130");      
     },
 });
+
 
 Clarinet.test({
     name: "Add a new owner",
@@ -239,6 +241,7 @@ Clarinet.test({
         assertEquals(block.receipts[0].result, "u1");
     },
 });
+
 
 Clarinet.test({
     name: "Set minimum confirmation requirement",
@@ -383,6 +386,7 @@ Clarinet.test({
     },
 });
 
+
 Clarinet.test({
     name: "Spend STX",
     async fn() {
@@ -438,6 +442,7 @@ Clarinet.test({
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"], 0);
     },
 });
+
 
 Clarinet.test({
     name: "A vault ownership exmaple",
@@ -558,5 +563,85 @@ Clarinet.test({
         ]);
        
         assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
+    },
+});
+
+
+Clarinet.test({
+    name: "Revoke",
+    async fn() {
+
+        // Tx not exists
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "revoke",
+                [types.uint(10)],
+                WALLETS[0]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), 'u140');
+
+        // Tx already confirmed
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "revoke",
+                [types.uint(4)],
+                WALLETS[0]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), 'u180');
+
+
+        // Start a new tx
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "submit",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
+                    types.uint(50000000)
+                ],
+                WALLETS[1]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "u5");
+
+        // Should reject becuase the owner hasn't confirmed the tx
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "revoke",
+                [types.uint(5)],
+                WALLETS[0]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), 'u190');
+
+        // should revoke
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "revoke",
+                [types.uint(5)],
+                WALLETS[1]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), 'true');
+
+        // confirmation should be removed
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "wallet",
+                "get-transaction",
+                [types.uint(5)],
+                WALLETS[0]
+              ),
+        ]);
+
+        assertEquals(JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple())).confirmations, '[]');
     },
 });
