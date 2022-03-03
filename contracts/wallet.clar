@@ -132,7 +132,7 @@
             (confirmations (get confirmations tx))
         )
         (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
-        (asserts! (not (is-none (index-of confirmations tx-sender))) ERR-TX-NOT-CONFIRMED-BY-SENDER)
+        (asserts! (is-some (index-of confirmations tx-sender)) ERR-TX-NOT-CONFIRMED-BY-SENDER)
         (var-set rem-confirmation tx-sender)
         (let 
             (
@@ -147,7 +147,7 @@
 
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
-        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) ERR-UNAUTHORIZED-SENDER)
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
         (let
             (
@@ -177,7 +177,7 @@
 
 (define-public (submit (executor <executor-trait>) (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
     (begin
-        (asserts! (not (is-none (index-of (var-get owners) tx-sender))) ERR-UNAUTHORIZED-SENDER)
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
         (let
             ((tx-id (add executor arg-p arg-u)))
