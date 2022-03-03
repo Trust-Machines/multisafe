@@ -192,7 +192,7 @@
 (define-private (init (o (list 50 principal)) (m uint))
     (begin
         (map add-owner-internal o)
-        (set-min-confirmation-internal u2)
+        (set-min-confirmation-internal m)
     )
 )
 
