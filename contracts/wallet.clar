@@ -25,7 +25,7 @@
 )
 
 ;; principal of the deployed contract
-(define-data-var self principal (as-contract tx-sender))
+(define-constant self (as-contract tx-sender))
 
 
 ;; owners
@@ -41,7 +41,7 @@
 
 (define-public (add-owner (owner principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF)
+        (asserts! (is-eq tx-sender self) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-none (index-of (var-get owners) owner)) ERR-OWNER-ALREADY-EXISTS)
         (ok (add-owner-internal owner))
     )
@@ -53,7 +53,7 @@
 
 (define-public (remove-owner (owner principal))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF)
+        (asserts! (is-eq tx-sender self) ERR-CALLER-MUST-BE-SELF)
         (asserts! (not ( is-none (index-of (var-get owners) owner) )) ERR-OWNER-NOT-EXISTS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter (var-get owners)) u50))))
@@ -74,7 +74,7 @@
 
 (define-public (set-min-confirmation (value uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get self)) ERR-CALLER-MUST-BE-SELF) 
+        (asserts! (is-eq tx-sender self) ERR-CALLER-MUST-BE-SELF) 
         (ok (set-min-confirmation-internal value))
     )
 )
@@ -148,7 +148,7 @@
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
+        (asserts! (is-eq (contract-of wallet) self) ERR-INVALID-WALLET) 
         (let
             (
                 (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
@@ -178,7 +178,7 @@
 (define-public (submit (executor <executor-trait>) (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (asserts! (is-eq (contract-of wallet) (var-get self)) ERR-INVALID-WALLET) 
+        (asserts! (is-eq (contract-of wallet) self) ERR-INVALID-WALLET) 
         (let
             ((tx-id (add executor arg-p arg-u)))
             (unwrap-panic (confirm tx-id executor wallet))
