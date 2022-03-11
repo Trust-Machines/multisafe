@@ -36,3 +36,4 @@ depends_on = []
 [contracts.set-vault-token-per-cycle]
 path = "contracts/executors/set-vault-token-per-cycle.clar"
 depends_on = ["wallet", "vault"]
+
