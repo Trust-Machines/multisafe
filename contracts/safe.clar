@@ -165,10 +165,7 @@
                     (new-tx (merge tx {confirmations: new-confirmations, confirmed: confirmed}))
                 )
                 (map-set transactions tx-id new-tx)
-                (if confirmed 
-                    (try! (as-contract (contract-call? executor execute safe (get arg-p tx) (get arg-u tx))))
-                    false
-                )
+                (and confirmed (try! (as-contract (contract-call? executor execute safe (get arg-p tx) (get arg-u tx)))))
                 (ok confirmed)
             )
         )
