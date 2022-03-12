@@ -15,7 +15,7 @@
 
 (impl-trait .traits.safe-trait)
 
-;; Error responses
+;; Errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
 (define-constant ERR-OWNER-ALREADY-EXISTS (err u110))
 (define-constant ERR-OWNER-NOT-EXISTS (err u120))
@@ -37,7 +37,9 @@
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
-(define-read-only (get-version) VERSION)
+(define-read-only (get-version) 
+    VERSION
+)
 
 ;; --- Owners
 
@@ -45,12 +47,12 @@
 (define-data-var owners (list 50 principal) (list)) 
 
 ;; Returns owner list
-;; @returns (ok list)
+;; @returns list
 (define-read-only (get-owners)
     (var-get owners)
 )
 
-;; Pushes a new member to owners list
+;; Private function to push a new member to the owners list
 ;; @params owner
 ;; @returns bool
 (define-private (add-owner-internal (owner principal))
@@ -149,7 +151,7 @@
     }
 )
 
-;; Inserts a new transaction into transactions map
+;; Private function to insert a new transaction into transactions map
 ;; @params executor ; contract address to be executed
 ;; @params param-p ; principal parameter to be passed to the executor function
 ;; @params param-u ; uint argument to be passed to the executor function
@@ -173,7 +175,7 @@
 )
 
 ;; Returns transactions by ids
-;; @params tx-ids ; transaction ids list
+;; @params tx-ids ; transaction id list
 ;; @returns list
 (define-read-only (get-transactions (tx-ids (list 20 uint)))
     (map get-transaction tx-ids)
@@ -213,7 +215,7 @@
 )
 
 
-;; Allow an owner to confirm a tranaction. If the transaction reaches sufficient confirmation number 
+;; Allows an owner to confirm a tranaction. If the transaction reaches sufficient confirmation number 
 ;; then the executor specified on the transaction gets triggered.
 ;; @restricted to owners who hasn't confirmed the transaction yet
 ;; @params executor ; contract address to be executed
@@ -246,9 +248,9 @@
     )
 )
 
-;; Adds a new transaction and confirms it for the owner who submitted it. So, a newly submitted 
-;; transaction automatically has one confirmation. If the safe's minimum required confirmation
-;; number is one then the transaction gets executed in this step.
+;; Allows an owner to add a new transaction and confirms it for the owner who submitted it. 
+;; So, a newly submitted transaction gets one confirmation automatically. If the safe's minimum
+;; required confirmation number is one then the transaction gets executed in this step.
 ;; @restricted to owners
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
