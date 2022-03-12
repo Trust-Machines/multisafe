@@ -14,7 +14,7 @@ Clarinet.test({
         WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x+1}`)!.address);
         DEPLOYER = accounts.get('deployer')!.address
 
-        // send some stx to the wallet contract
+        // send some stx to the safe contract
         CHAIN.mineBlock([
             Tx.transferSTX(
                 50000000,
@@ -30,7 +30,7 @@ Clarinet.test({
 
 
 Clarinet.test({
-    name: "Wallet only checks",
+    name: "Safe only checks",
     async fn() {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
@@ -391,7 +391,7 @@ Clarinet.test({
     name: "Spend STX",
     async fn() {
 
-        // Start a new transaction to send STX from the wallet to another account
+        // Start a new transaction to send STX from the safe to another account
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -437,7 +437,7 @@ Clarinet.test({
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "true");      
         
-        // The transaction confirmed. STX balance of the wallet should be 0.
+        // The transaction confirmed. STX balance of the safe should be 0.
         const assetMap = CHAIN.getAssetsMaps();
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 0);
     },
@@ -448,7 +448,7 @@ Clarinet.test({
     name: "A vault ownership exmaple",
     async fn() {
 
-        // We have an imaginary vault contract and owner of the contract is the wallet
+        // We have an imaginary vault contract and owner of the contract is the safe contract
         // We want to update `token-per-cycle` by calling an owner only function `set-token-per-cycle`
 
         // Default token per cycle is u100
@@ -462,7 +462,7 @@ Clarinet.test({
         ]);
         assertEquals(block.receipts[0].result, "u100");
 
-        // The vault contract can't be updated directly by a user because it is owned by the wallet contract
+        // The vault contract can't be updated directly by a user because it is owned by the safe contract
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "vault",
