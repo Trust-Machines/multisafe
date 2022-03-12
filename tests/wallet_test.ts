@@ -18,13 +18,13 @@ Clarinet.test({
         CHAIN.mineBlock([
             Tx.transferSTX(
                 50000000,
-                "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet",
+                "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe",
                 "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
               ),
         ]);
 
         const assetMap = CHAIN.getAssetsMaps();
-        assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"], 50000000);
+        assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 50000000);
     },
 });
 
@@ -34,7 +34,7 @@ Clarinet.test({
     async fn() {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "add-owner",
                 [types.principal(WALLETS[3])],
                 WALLETS[0]
@@ -44,7 +44,7 @@ Clarinet.test({
 
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "remove-owner",
                 [types.principal(WALLETS[2])],
                 WALLETS[1]
@@ -54,7 +54,7 @@ Clarinet.test({
 
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "set-min-confirmation",
                 [types.uint(1)],
                 WALLETS[2]
@@ -70,11 +70,11 @@ Clarinet.test({
     async fn() {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND"),
                     types.uint(0)
                 ],
@@ -85,12 +85,12 @@ Clarinet.test({
 
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                 ],
                 WALLETS[3]
               ),
@@ -106,7 +106,7 @@ Clarinet.test({
         // Check current owners. Should be 3.
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-owners",
                 [],
                 WALLETS[0]
@@ -122,11 +122,11 @@ Clarinet.test({
         // Start a new transaction to add a new owner.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal(WALLETS[3]),
                     types.uint(0)
                 ],
@@ -138,7 +138,7 @@ Clarinet.test({
         // The new transaction should be available in the transacions mapping.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-transaction",
                 [types.uint(0)],
                 WALLETS[0]
@@ -155,12 +155,12 @@ Clarinet.test({
         // The user already confirmed transaction by submitting it. Should revert.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[0]
               ),
@@ -170,12 +170,12 @@ Clarinet.test({
         // Destination parameter should be passed properly. Should revert.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(0),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[1]
               ),
@@ -185,12 +185,12 @@ Clarinet.test({
         // Owner 2 confirms.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[1]
               ),
@@ -200,7 +200,7 @@ Clarinet.test({
         // The transaction confirmed by sufficient number of owners.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-transaction",
                 [types.uint(0)],
                 WALLETS[0]
@@ -218,7 +218,7 @@ Clarinet.test({
         // New owner should be added. should be 4.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-owners",
                 [],
                 WALLETS[0]
@@ -232,7 +232,7 @@ Clarinet.test({
         // Nonce should be incremented.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-nonce",
                 [],
                 WALLETS[0]
@@ -249,7 +249,7 @@ Clarinet.test({
         // Check current value. should be 2.
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-min-confirmation",
                 [],
                 WALLETS[0]
@@ -260,11 +260,11 @@ Clarinet.test({
         // Start a transaction to update minimum confirmation requirement.
          block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
                     types.uint(3)
                 ],
@@ -276,12 +276,12 @@ Clarinet.test({
         // // Owner 2 confirms. The transaction confirmed.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(1),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[1]
               ),
@@ -291,7 +291,7 @@ Clarinet.test({
         // Minimum confirmation requirement should be updated as 3.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-min-confirmation",
                 [],
                 WALLETS[0]
@@ -309,11 +309,11 @@ Clarinet.test({
         // Start a new transaction to remove an owner.
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"),
                     types.uint(0)
                 ],
@@ -325,12 +325,12 @@ Clarinet.test({
         // Owner 2 confirms.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(2),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[1]
               ),
@@ -340,12 +340,12 @@ Clarinet.test({
         // Owner 3 confirms.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(2), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[2]
               ),
@@ -355,7 +355,7 @@ Clarinet.test({
         // The transaction confirmed.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-transaction",
                 [types.uint(2)],
                 WALLETS[0]
@@ -374,7 +374,7 @@ Clarinet.test({
         // New owner should be added. Now we should have 4 owners.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-owners",
                 [],
                 WALLETS[0]
@@ -394,11 +394,11 @@ Clarinet.test({
         // Start a new transaction to send STX from the wallet to another account
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
                     types.uint(50000000)
                 ],
@@ -410,12 +410,12 @@ Clarinet.test({
        // Owner 2 confirms.
        block = CHAIN.mineBlock([
         Tx.contractCall(
-            "wallet",
+            "safe",
             "confirm",
             [
                 types.uint(3), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
             ],
             WALLETS[2]
           ), 
@@ -425,12 +425,12 @@ Clarinet.test({
         // Owner 3 confirms.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(3),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[3]
             ),
@@ -439,7 +439,7 @@ Clarinet.test({
         
         // The transaction confirmed. STX balance of the wallet should be 0.
         const assetMap = CHAIN.getAssetsMaps();
-        assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"], 0);
+        assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 0);
     },
 });
 
@@ -476,11 +476,11 @@ Clarinet.test({
         // Start transaction to update `token-per-cycle`
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
                     types.uint(1200)
                 ],
@@ -492,12 +492,12 @@ Clarinet.test({
         // Owner 2 confirms.
        block = CHAIN.mineBlock([
         Tx.contractCall(
-            "wallet",
+            "safe",
             "confirm",
             [
                 types.uint(4), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
             ],
             WALLETS[2]
           ), 
@@ -507,12 +507,12 @@ Clarinet.test({
         //  Owner 3 confirms.
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "confirm",
                 [
                     types.uint(4), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[3]
             ),
@@ -538,7 +538,7 @@ Clarinet.test({
     async fn() {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-transactions",
                 [types.list([types.uint(0), types.uint(1), types.uint(2), types.uint(3) , types.uint(4)])],
                 WALLETS[0]
@@ -555,7 +555,7 @@ Clarinet.test({
     async fn() {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-version",
                 [],
                 WALLETS[0]
@@ -574,7 +574,7 @@ Clarinet.test({
         // Tx not exists
         let block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "revoke",
                 [types.uint(10)],
                 WALLETS[0]
@@ -585,7 +585,7 @@ Clarinet.test({
         // Tx already confirmed
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "revoke",
                 [types.uint(4)],
                 WALLETS[0]
@@ -597,11 +597,11 @@ Clarinet.test({
         // Start a new tx
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "submit",
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
                     types.uint(50000000)
                 ],
@@ -613,7 +613,7 @@ Clarinet.test({
         // Should reject becuase the owner hasn't confirmed the tx
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "revoke",
                 [types.uint(5)],
                 WALLETS[0]
@@ -624,7 +624,7 @@ Clarinet.test({
         // should revoke
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "revoke",
                 [types.uint(5)],
                 WALLETS[1]
@@ -635,7 +635,7 @@ Clarinet.test({
         // confirmation should be removed
         block = CHAIN.mineBlock([
             Tx.contractCall(
-                "wallet",
+                "safe",
                 "get-transaction",
                 [types.uint(5)],
                 WALLETS[0]

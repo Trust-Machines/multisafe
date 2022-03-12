@@ -1,9 +1,9 @@
-;; A multi-signature wallet
+;; 
 
 (use-trait executor-trait .traits.executor-trait)
-(use-trait wallet-trait .traits.wallet-trait)
+(use-trait safe-trait .traits.safe-trait)
 
-(impl-trait .traits.wallet-trait)
+(impl-trait .traits.safe-trait)
 
 ;; errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
@@ -13,7 +13,7 @@
 (define-constant ERR-TX-NOT-FOUND (err u140))
 (define-constant ERR-TX-ALREADY-CONFIRMED-BY-OWNER (err u150))
 (define-constant ERR-TX-INVALID-EXECUTOR (err u160))
-(define-constant ERR-INVALID-WALLET (err u170))
+(define-constant ERR-INVALID-SAFE (err u170))
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 
@@ -145,10 +145,10 @@
     )
 )
 
-(define-public (confirm (tx-id uint) (executor <executor-trait>) (wallet <wallet-trait>))
+(define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (asserts! (is-eq (contract-of wallet) self) ERR-INVALID-WALLET) 
+        (asserts! (is-eq (contract-of safe) self) ERR-INVALID-SAFE) 
         (let
             (
                 (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
@@ -166,7 +166,7 @@
                 )
                 (map-set transactions tx-id new-tx)
                 (if confirmed 
-                    (try! (as-contract (contract-call? executor execute wallet (get arg-p tx) (get arg-u tx))))
+                    (try! (as-contract (contract-call? executor execute safe (get arg-p tx) (get arg-u tx))))
                     false
                 )
                 (ok confirmed)
@@ -175,13 +175,13 @@
     )
 )
 
-(define-public (submit (executor <executor-trait>) (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
+(define-public (submit (executor <executor-trait>) (safe <safe-trait>) (arg-p principal) (arg-u uint))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (asserts! (is-eq (contract-of wallet) self) ERR-INVALID-WALLET) 
+        (asserts! (is-eq (contract-of safe) self) ERR-INVALID-SAFE) 
         (let
             ((tx-id (add executor arg-p arg-u)))
-            (unwrap-panic (confirm tx-id executor wallet))
+            (unwrap-panic (confirm tx-id executor safe))
             (ok tx-id)
         )
     )

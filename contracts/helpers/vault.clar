@@ -1,7 +1,7 @@
 
 (define-constant err-caller-must-be-owner (err u900))
 
-(define-data-var owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.wallet)
+(define-data-var owner principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe)
 
 (define-data-var token-per-cycle uint u100)
 

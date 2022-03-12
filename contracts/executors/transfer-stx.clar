@@ -1,6 +1,6 @@
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)
-(use-trait wallet-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.wallet-trait)
+(use-trait safe-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.safe-trait)
 
-(define-public (execute (wallet <wallet-trait>) (arg-p principal) (arg-u uint))
-		(stx-transfer? arg-u (contract-of wallet) arg-p)
+(define-public (execute (safe <safe-trait>) (arg-p principal) (arg-u uint))
+		(stx-transfer? arg-u (contract-of safe) arg-p)
 )

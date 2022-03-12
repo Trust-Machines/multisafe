@@ -1,4 +1,4 @@
-(define-trait wallet-trait
+(define-trait safe-trait
 	(
 		(add-owner (principal) (response bool uint))
 		(remove-owner (principal) (response bool uint))
@@ -8,7 +8,7 @@
 
 (define-trait executor-trait
 	(
-		(execute (<wallet-trait> principal uint) (response bool uint))
+		(execute (<safe-trait> principal uint) (response bool uint))
 	)
 )
 
