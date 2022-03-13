@@ -282,6 +282,7 @@
     (begin
         (map add-owner-internal o)
         (set-min-confirmation-internal m)
+        (print "multisafe-init")
     )
 )
 
