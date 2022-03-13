@@ -86,7 +86,7 @@
 (define-public (remove-owner (owner principal))
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
-        (asserts! (not ( is-none (index-of (var-get owners) owner) )) ERR-OWNER-NOT-EXISTS)
+        (asserts! (is-some (index-of (var-get owners) owner)) ERR-OWNER-NOT-EXISTS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter (var-get owners)) u50))))
     )
