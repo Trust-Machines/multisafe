@@ -4,11 +4,20 @@ A multi-owner contract to manage Stacks Blockchain resources that requires n num
 
 ## Features
 
-- Can hold STX, SIP-009 NFT and SIP-010 FT
+- Can hold STX, SIP-009 Non-fungible tokens and SIP-010 Fungible tokens
+- Supports up to 20 owners
 - UI support (coming soon)
 - Integration with Hiro wallet
 
----
+## Test
+
+Run contract tests:
+
+``` clarinet test ```
+
+## Security
+
+The code hasn't audited by a independent security team yet. Use at your own risk.
 
 ## API Reference
 
