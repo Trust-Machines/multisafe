@@ -7,7 +7,7 @@
 ;; executor-trait interface. The executor function gets triggered along with two parameters (param-p a principal 
 ;; paramter and param-u an uint paramter) when the transaction receive sufficient number of confirmations from 
 ;; owners. The target executor function can execute any kind of code with authority of the safe contract instance
-;; such as STX tranfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 50 
+;; such as STX tranfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
 (use-trait executor-trait .traits.executor-trait) 
@@ -45,7 +45,7 @@
 ;; --- Owners
 
 ;; The owners list
-(define-data-var owners (list 50 principal) (list)) 
+(define-data-var owners (list 20 principal) (list)) 
 
 ;; Returns owner list
 ;; @returns list
@@ -57,7 +57,7 @@
 ;; @params owner
 ;; @returns bool
 (define-private (add-owner-internal (owner principal))
-    (var-set owners (unwrap-panic (as-max-len? (append (var-get owners) owner) u50)))
+    (var-set owners (unwrap-panic (as-max-len? (append (var-get owners) owner) u20)))
 )
 
 ;; Adds new owner
@@ -93,7 +93,7 @@
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
         (var-set rem-owner owner)
-        (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u50))))
+        (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
 )
 
@@ -149,7 +149,7 @@
     uint 
     {
         executor: principal,
-        confirmations: (list 50 principal),
+        confirmations: (list 20 principal),
         confirmed: bool,
         param-p: principal,
         param-u: uint
@@ -210,7 +210,7 @@
         (var-set rem-confirmation tx-sender)
         (let 
             (
-                (new-confirmations  (unwrap-panic (as-max-len? (filter remove-confirmation-filter confirmations) u50)))
+                (new-confirmations  (unwrap-panic (as-max-len? (filter remove-confirmation-filter confirmations) u20)))
                 (new-tx (merge tx {confirmations: new-confirmations}))
             )
             (map-set transactions tx-id new-tx)
@@ -241,7 +241,7 @@
             
             (let 
                 (
-                    (new-confirmations (unwrap-panic (as-max-len? (append confirmations tx-sender) u50)))
+                    (new-confirmations (unwrap-panic (as-max-len? (append confirmations tx-sender) u20)))
                     (confirmed (>= (len new-confirmations) (var-get min-confirmation)))
                     (new-tx (merge tx {confirmations: new-confirmations, confirmed: confirmed}))
                 )
@@ -278,7 +278,7 @@
 ;; Safe initializer
 ;; @params o ; owners list
 ;; @params m ; minimum required confirmation number
-(define-private (init (o (list 50 principal)) (m uint))
+(define-private (init (o (list 20 principal)) (m uint))
     (begin
         (map add-owner-internal o)
         (set-min-confirmation-internal m)
