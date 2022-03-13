@@ -214,6 +214,7 @@
                 (new-tx (merge tx {confirmations: new-confirmations}))
             )
             (map-set transactions tx-id new-tx)
+            (print {action: "multisafe-revoke", sender: tx-sender, tx-id: tx-id})
             (ok true)
         )
     )
@@ -247,6 +248,7 @@
                 )
                 (map-set transactions tx-id new-tx)
                 (and confirmed (try! (as-contract (contract-call? executor execute safe (get param-p tx) (get param-u tx)))))
+                (print {action: "multisafe-confirmation", sender: tx-sender, tx-id: tx-id, confirmed: confirmed})
                 (ok confirmed)
             )
         )
@@ -268,6 +270,7 @@
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
             ((tx-id (add executor param-p param-u)))
+            (print {action: "multisafe-submit", sender: tx-sender, tx-id: tx-id, executor: executor, param-p: param-p, param-u: param-u})
             (unwrap-panic (confirm tx-id executor safe))
             (ok tx-id)
         )
@@ -282,7 +285,7 @@
     (begin
         (map add-owner-internal o)
         (set-min-confirmation-internal m)
-        (print "multisafe-init")
+        (print {action: "multisafe-init"})
     )
 )
 
