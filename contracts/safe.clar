@@ -225,7 +225,7 @@
 ;; @restricted to owners who hasn't confirmed the transaction yet
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
-;; @returns (response uint)
+;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)

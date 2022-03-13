@@ -14,13 +14,17 @@ A multi-owner contract to manage Stacks Blockchain resources that requires n num
 
 ### Owner only functions
 
+The following function can be run by only safe owners:
+
 `submit (executor <executor-trait>, safe <safe-trait>, param-p principal, param-u uint) => (response uint)`
 
-`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>) => (response uint)`
+`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>) => (response bool)`
 
 `revoke (tx-id uint) => (response bool)`
 
 ### Safe only functions
+
+The following functions can be run by only safe contract itself and requires the minimum number of confirmations:
 
 `add-owner (owner principal) => (response bool)` 
 
