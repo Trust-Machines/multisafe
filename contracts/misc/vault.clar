@@ -1,3 +1,8 @@
+;; Title: Multi-Safe example vault
+;; Author: Talha Bugra Bulut & Trust Machines
+;; 
+;; Synopsis:
+;; An example vault contract for simulation executor (executors/set-vault-token-per-cycle.clar)
 
 (define-constant err-caller-must-be-owner (err u900))
 
