@@ -26,6 +26,7 @@
 (define-constant ERR-INVALID-SAFE (err u170))
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
+(define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -90,6 +91,7 @@
         )
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
+        (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u50))))
     )
