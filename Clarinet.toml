@@ -30,7 +30,7 @@ path = "contracts/executors/transfer-stx.clar"
 depends_on = ["safe"]
 
 [contracts.vault]
-path = "contracts/helpers/vault.clar"
+path = "contracts/misc/vault.clar"
 depends_on = []
 
 [contracts.set-vault-token-per-cycle]
