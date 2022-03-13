@@ -27,6 +27,8 @@
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
+(define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
+
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -121,7 +123,8 @@
 ;; @returns (response bool)
 (define-public (set-min-confirmation (value uint))
     (begin
-        (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF) 
+        (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+        (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
         (ok (set-min-confirmation-internal value))
     )
 )
