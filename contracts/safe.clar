@@ -84,11 +84,14 @@
 ;; @params owner
 ;; @returns (response bool)
 (define-public (remove-owner (owner principal))
-    (begin
+    (let
+        (
+            (owners-list (var-get owners))
+        )
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
-        (asserts! (is-some (index-of (var-get owners) owner)) ERR-OWNER-NOT-EXISTS)
+        (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (var-set rem-owner owner)
-        (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter (var-get owners)) u50))))
+        (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u50))))
     )
 )
 
