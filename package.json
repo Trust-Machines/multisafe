@@ -1,0 +1,14 @@
+{
+    "name": "multisafe-contracts",
+    "version": "0.1.2",
+    "main": "index.js",
+    "files": [
+      "contracts/safe.clar",
+      "contracts/traits.clar",
+      "contracts/executors/add-owner.clar",
+      "contracts/executors/remove-owner.clar",
+      "contracts/executors/set-min-confirmation.clar",
+      "contracts/executors/transfer-stx.clar"
+    ]
+  }
+  
