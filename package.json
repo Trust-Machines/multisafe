@@ -1,14 +1,19 @@
 {
-    "name": "multisafe-contracts",
-    "version": "0.1.2",
-    "main": "index.js",
-    "files": [
-      "contracts/safe.clar",
-      "contracts/traits.clar",
-      "contracts/executors/add-owner.clar",
-      "contracts/executors/remove-owner.clar",
-      "contracts/executors/set-min-confirmation.clar",
-      "contracts/executors/transfer-stx.clar"
-    ]
+  "name": "multisafe-contracts",
+  "version": "0.1.2",
+  "main": "index.js",
+  "files": [
+    "contracts/safe.clar",
+    "contracts/traits.clar",
+    "contracts/executors/add-owner.clar",
+    "contracts/executors/remove-owner.clar",
+    "contracts/executors/set-min-confirmation.clar",
+    "contracts/executors/transfer-stx.clar"
+  ],
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "jotai": "^1.6.1",
+    "react-app-rewired": "^2.2.1",
+    "stream": "^0.0.2"
   }
-  
+}

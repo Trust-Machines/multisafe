@@ -1,94 +1,55 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { Button } from 'react-bootstrap';
+import { Connect } from '@stacks/connect-react';
+import Deployer from './Pages/Deployer';
+import { Router, Link } from '@reach/router';
+
 import "./App.scss";
 
-import { Form, Button } from "react-bootstrap";
+// import { makeSafeContract } from "multisafe-contracts";
+// import safe from "multisafe-contracts/contracts/safe.clar";
 
-import { useState } from "react";
-
-import { makeSafeContract } from "multisafe-contracts";
-import safe from "multisafe-contracts/contracts/safe.clar";
+import { userDataState, userSessionState, useConnect } from './lib/auth';
 
 function App() {
-  const [network, setNetwork] = useState("mainnet");
-  const [owners, setOwners] = useState("");
-  const [minConfirmation, setMinConfirmation] = useState(2);
-  const [step, setStep] = useState(1);
 
-  const next = () => {
-    setStep(2);
+  const { authOptions, handleOpenAuth, handleSignOut } = useConnect();
+  const [userSession] = useAtom(userSessionState);
+  const [userData, setUserData] = useAtom(userDataState);
+
+  const authenticated = userSession && userSession.isUserSignedIn();
+
+  useEffect(() => {
+    if (userSession?.isUserSignedIn()) {
+      setUserData(userSession.loadUserData());
+    } else if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn();
+    }
+  }, [userSession, setUserData]);
+
+  if (!authenticated) {
+    return (
+      <Connect authOptions={authOptions}>
+        <Button onClick={handleOpenAuth}>Connect Hiro Wallet</Button>
+      </Connect>
+    );
   }
 
-  const back = () => {
-    setStep(1);
+  //console.log(userData?.profile.stxAddress)
+
+  if (userData) {
+    return <Deployer path="/" userData={userData} />
+
   }
 
-  const deploy = () => {
-    
-  }
+  return null;
 
-  const code =
-    step === 2
-      ? makeSafeContract(
-          safe,
-          [owners.split("\n").map(x => x.trim())],
-          minConfirmation
-        )
-      : "";
-
+  /*
   return (
-    <div className="App">
-      {step === 1 && (
-        <Form>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Network</Form.Label>
-            <Form.Select
-              value={network}
-              onChange={(e) => {
-                setNetwork(e.target.value);
-              }}
-            >
-              <option value="mainnet">Mainnet</option>
-              <option value="testnet">Testnet</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Owners</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={owners}
-              onChange={(e) => {
-                setOwners(e.target.value);
-              }}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Minimum confirmation</Form.Label>
-            <Form.Control
-              type="number"
-              value={minConfirmation}
-              onChange={(e) => {
-                setMinConfirmation(e.target.value);
-              }}
-            />
-          </Form.Group>
-
-          <Button variant="primary" onClick={next}>Next</Button>
-        </Form>
-      )}
-
-      {step === 2 && (
-        <Form>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Contract</Form.Label>
-            <Form.Control as="textarea" rows={10} value={code} readOnly={true} />
-          </Form.Group>
-          <Button variant="secondary">Back</Button>
-          <Button variant="primary" onClick={deploy}>Deploy</Button>
-        </Form>
-      )}
-    </div>
+    <Button onClick={handleSignOut}>Exit</Button>
   );
+  */
 }
 
 export default App;
