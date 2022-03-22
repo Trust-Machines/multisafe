@@ -1,6 +1,6 @@
 {
   "name": "multisafe-contracts",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "index.js",
   "files": [
     "contracts/safe.clar",
