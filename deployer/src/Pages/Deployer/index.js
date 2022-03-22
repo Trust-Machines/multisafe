@@ -1,17 +1,19 @@
-import { useState, useCallback } from 'react';
-import { Form, Button, InputGroup, Table } from 'react-bootstrap';
-import Editor, { Monaco } from '@monaco-editor/react';
-import { validateStacksAddress } from '@stacks/transactions';
-import { useConnect } from '@stacks/connect-react';
-import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { useState } from 'react';
+import { Form, Button, Table } from 'react-bootstrap';
 
-import { logoutSvg } from '../../svg';
+import { validateStacksAddress } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
+import { useConnect } from '@stacks/connect-react';
+
+import Editor, { Monaco } from '@monaco-editor/react';
+
 import { makeSafeContract } from 'multisafe-contracts';
 import safe from 'multisafe-contracts/contracts/safe.clar';
 
 import { useAuth } from '../../common/auth';
+import { logoutSvg } from '../../svg';
 
-import './index.scss';
+import './style.scss';
 
 function Deployer({ userData }) {
 
@@ -120,7 +122,7 @@ function Deployer({ userData }) {
         <div className='deployer-main'>
             <div className='deployer-options'>
                 <Form>
-                    <Form.Group controlId='safe-name'>
+                    <Form.Group controlId='safe-name' as='p'>
                         <Form.Label>Safe name</Form.Label>
                         <Form.Control
                             isInvalid={validation.name}
@@ -133,7 +135,7 @@ function Deployer({ userData }) {
                         {!validation.name && <Form.Text muted>Only alphanumeric characters and '-'</Form.Text>}
                         {validation.name && <Form.Control.Feedback type='invalid'>{validation.name}</Form.Control.Feedback>}
                     </Form.Group>
-                    <Form.Group controlId='network'>
+                    <Form.Group controlId='network' as='p'>
                         <Form.Label>Network</Form.Label>
                         <Form.Select
                             value={network}
@@ -143,7 +145,7 @@ function Deployer({ userData }) {
                             <option value='testnet'>Testnet</option>
                         </Form.Select>
                     </Form.Group>
-                    <Form.Group controlId='wallet'>
+                    <Form.Group controlId='wallet' as='p'>
                         <Form.Label>Owners</Form.Label>
                         <Form.Control
                             isInvalid={validation.owner}
@@ -169,7 +171,7 @@ function Deployer({ userData }) {
                             </Table>
                         )}
                     </Form.Group>
-                    <Form.Group controlId='threshold'>
+                    <Form.Group controlId='threshold' as='p'>
                         <Form.Label>Confirmation threshold</Form.Label>
                         <Form.Control
                             isInvalid={validation.threshold}

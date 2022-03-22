@@ -5,13 +5,13 @@ import { Connect } from '@stacks/connect-react';
 
 import Deployer from './Pages/Deployer';
 
-import "./App.scss";
+import './App.scss';
 
 import { userDataState, userSessionState, useAuth } from './common/auth';
 
 function App() {
 
-  const { authOptions, handleOpenAuth, handleSignOut } = useAuth();
+  const { authOptions, handleOpenAuth } = useAuth();
   const [userSession] = useAtom(userSessionState);
   const [userData, setUserData] = useAtom(userDataState);
 
