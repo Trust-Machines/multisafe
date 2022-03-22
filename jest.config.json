@@ -1,0 +1,9 @@
+{
+  "testPathIgnorePatterns": [
+    "<rootDir>/build",
+    "<rootDir>/tests"
+  ],
+  "transform": {
+    "^.+\\.(ts|tsx)?$": "ts-jest"
+  }
+}

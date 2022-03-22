@@ -30,7 +30,8 @@ function Deployer({ userData }) {
     const code = makeSafeContract(
         safe,
         owners,
-        threshold
+        threshold,
+        network
     )
 
     const updateValidation = (key, value) => {
