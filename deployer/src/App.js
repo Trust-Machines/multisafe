@@ -2,15 +2,16 @@ import { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { Button } from 'react-bootstrap';
 import { Connect } from '@stacks/connect-react';
+
 import Deployer from './Pages/Deployer';
 
 import "./App.scss";
 
-import { userDataState, userSessionState, useConnect } from './lib/auth';
+import { userDataState, userSessionState, useAuth } from './common/auth';
 
 function App() {
 
-  const { authOptions, handleOpenAuth, handleSignOut } = useConnect();
+  const { authOptions, handleOpenAuth, handleSignOut } = useAuth();
   const [userSession] = useAtom(userSessionState);
   const [userData, setUserData] = useAtom(userDataState);
 
@@ -34,6 +35,7 @@ function App() {
       </Connect>
     );
   }
+
 
   if (userData) {
     return <Connect authOptions={authOptions}><Deployer userData={userData} /></Connect>

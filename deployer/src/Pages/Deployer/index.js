@@ -2,19 +2,21 @@ import { useState, useCallback } from 'react';
 import { Form, Button, InputGroup, Table } from 'react-bootstrap';
 import Editor, { Monaco } from '@monaco-editor/react';
 import { validateStacksAddress } from '@stacks/transactions';
-import { useConnect as useConnect2 } from '@stacks/connect-react';
+import { useConnect } from '@stacks/connect-react';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
 import { logoutSvg } from '../../svg';
 import { makeSafeContract } from 'multisafe-contracts';
 import safe from 'multisafe-contracts/contracts/safe.clar';
 
-import { useConnect } from '../../lib/auth';
+import { useAuth } from '../../common/auth';
 
 import './index.scss';
 
 function Deployer({ userData }) {
-    const { handleSignOut } = useConnect();
+
+    const { handleSignOut } = useAuth();
+    const { doContractDeploy } = useConnect();
 
     const [name, setName] = useState('');
     const [network, setNetwork] = useState('testnet');
@@ -28,8 +30,6 @@ function Deployer({ userData }) {
         owners,
         threshold
     )
-
-    const { doContractDeploy } = useConnect2();
 
     const updateValidation = (key, value) => {
         setValidation({ ...validation, [key]: value });

@@ -8,15 +8,12 @@ const appConfig = new AppConfig(['store_write', 'publish_data'], document.locati
 
 export const userSessionState = atom(new UserSession({ appConfig }));
 export const userDataState = atom();
-export const authResponseState = atom();
 
-export const useConnect = () => {
+export const useAuth = () => {
   const [userSession] = useAtom(userSessionState);
   const setUserData = useUpdateAtom(userDataState);
-  const setAuthResponse = useUpdateAtom(authResponseState);
 
   const onFinish = async payload => {
-    setAuthResponse(payload.authResponse);
     const userData = await payload.userSession.loadUserData();
     setUserData(userData);
   };
