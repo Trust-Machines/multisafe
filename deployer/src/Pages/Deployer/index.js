@@ -1,109 +1,194 @@
-import { useState, useCallback } from "react";
-import { Form, Button, InputGroup, Table } from "react-bootstrap";
+import { useState, useCallback } from 'react';
+import { Form, Button, InputGroup, Table } from 'react-bootstrap';
 import Editor, { Monaco } from '@monaco-editor/react';
+import { validateStacksAddress } from '@stacks/transactions';
+import { useConnect as useConnect2 } from '@stacks/connect-react';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
-import { logoutSvg } from "../../svg";
-import { makeSafeContract } from "multisafe-contracts";
-import safe from "multisafe-contracts/contracts/safe.clar";
+import { logoutSvg } from '../../svg';
+import { makeSafeContract } from 'multisafe-contracts';
+import safe from 'multisafe-contracts/contracts/safe.clar';
 
 import { useConnect } from '../../lib/auth';
 
-import "./index.scss";
+import './index.scss';
 
 function Deployer({ userData }) {
     const { handleSignOut } = useConnect();
 
-    const [network, setNetwork] = useState("mainnet");
-    const [owners, setOwners] = useState(
-        [userData.profile.stxAddress.mainnet]
-    );
-    const [minConfirmation, setMinConfirmation] = useState(2);
-    const [owner, setOwner] = useState("");
+    const [name, setName] = useState('');
+    const [network, setNetwork] = useState('testnet');
+    const [owners, setOwners] = useState([]);
+    const [owner, setOwner] = useState('');
+    const [threshold, setThreshold] = useState(2);
+    const [validation, setValidation] = useState({ name: '', owner: '', threshold: '' });
 
     const code = makeSafeContract(
         safe,
         owners,
-        minConfirmation
+        threshold
     )
 
-    const deploy = () => {
+    const { doContractDeploy } = useConnect2();
 
+    const updateValidation = (key, value) => {
+        setValidation({ ...validation, [key]: value });
     }
-    
-    return <div className="deployer">
-        <div className="deployer-nav">
-            <div className="deployer-nav-brand">
-               <span className="brand-primary">MultiSafe</span> deployer
+
+    const nameChanged = (e) => {
+        setName(e.target.value);
+        updateValidation('name', '');
+    }
+
+    const networkChanged = (e) => {
+        setNetwork(e.target.value);
+    }
+
+    const ownerChanged = (e) => {
+        setOwner(e.target.value);
+        updateValidation('owner', '');
+    }
+
+    const addOwner = () => {
+        if (owner.trim() === '') {
+            return;
+        }
+
+        if (!validateStacksAddress(owner.trim())) {
+            updateValidation('owner', 'Not a valid stacks wallet address');
+            return;
+        }
+
+        if (owners.find(x => x === owner.trim())) {
+            updateValidation('owner', 'The address is already in the list');
+            return;
+        }
+
+        setOwners([...owners, owner.trim()]);
+        updateValidation('owner', '');
+        setOwner('');
+    }
+
+    const deleteOwner = (o) => {
+        setOwners([...owners.filter(x => x !== o)])
+    }
+
+    const thresholdChanged = (e) => {
+        setThreshold(e.target.value);
+        updateValidation('threshold', '');
+    }
+
+    const deploy = () => {
+        if (!/^[a-zA-Z0-9-]+$/.test(name)) {
+            updateValidation('name', 'Enter a valid safe name');
+            return
+        }
+
+        if (owners.length === 0) {
+            updateValidation('owner', 'At least one owner required');
+            return;
+        }
+
+        if (threshold > owners.length) {
+            updateValidation('threshold', 'Threshold is higher than total owner count');
+            return;
+        }
+
+        doContractDeploy({
+            network: network === 'mainnet' ? new StacksMainnet() : new StacksTestnet(),
+            contractName: name,
+            codeBody: code,
+            onFinish: data => {
+                console.log('finished stx transfer!', data);
+            },
+            onCancel: () => {
+                console.log('popup closed!');
+            },
+        });
+    }
+
+    return <div className='deployer'>
+        <div className='deployer-nav'>
+            <div className='deployer-nav-brand'>
+                <span className='brand-primary'>MultiSafe</span> deployer
             </div>
-            <div className="deployer-account">
+            <div className='deployer-account'>
                 {userData.profile.stxAddress[network]}
-                <Button variant="outline-primary" size="sm" onClick={handleSignOut}>{logoutSvg}</Button>
+                <Button variant='outline-light' size='sm' onClick={handleSignOut}>{logoutSvg}</Button>
             </div>
         </div>
-        <div className="deployer-main">
-            <div className="deployer-options">
+        <div className='deployer-main'>
+            <div className='deployer-options'>
                 <Form>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Group controlId='safe-name'>
+                        <Form.Label>Safe name</Form.Label>
+                        <Form.Control
+                            isInvalid={validation.name}
+                            type='text'
+                            autoFocus={true}
+                            maxLength={40}
+                            value={name}
+                            onChange={nameChanged}
+                        />
+                        {!validation.name && <Form.Text muted>Only alphanumeric characters and '-'</Form.Text>}
+                        {validation.name && <Form.Control.Feedback type='invalid'>{validation.name}</Form.Control.Feedback>}
+                    </Form.Group>
+                    <Form.Group controlId='network'>
                         <Form.Label>Network</Form.Label>
                         <Form.Select
                             value={network}
-                            onChange={(e) => {
-                                setNetwork(e.target.value);
-                            }}
+                            onChange={networkChanged}
                         >
-                            <option value="mainnet">Mainnet</option>
-                            <option value="testnet">Testnet</option>
+                            <option value='mainnet'>Mainnet</option>
+                            <option value='testnet'>Testnet</option>
                         </Form.Select>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Group controlId='wallet'>
                         <Form.Label>Owners</Form.Label>
-                        <InputGroup className="mb-3">
-                            <Form.Control
-                                placeholder="Wallet address" value={owner} onChange={(e) => {
-                                    setOwner(e.target.value);
-                                }}
-                            />
-                            <Button variant="outline-primary" onClick={() => {
-                                setOwners([...owners, owner]);
-                                setOwner('');
-                            }}>
-                                Add
-                            </Button>
-                        </InputGroup>
-                        <Table striped bordered hover size="sm">
-                            <tbody>
-                                {owners.map(o => <tr>
-                                    <td><small>{o}</small></td>
-                                    <td><Button size="sm" variant="danger" onClick={() => {
-                                        setOwners([...owners.filter(x => x !== o)])
-                                    }}>X</Button> </td>
-                                </tr>)}
-                            </tbody>
-                        </Table>
-                    </Form.Group>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                        <Form.Label>Confirmation threshold</Form.Label>
                         <Form.Control
-                            type="number"
-                            value={minConfirmation}
-                            min={1}
-                            max={20}
-                            onChange={(e) => {
-                                setMinConfirmation(e.target.value);
+                            isInvalid={validation.owner}
+                            placeholder='Enter a wallet address and press enter' value={owner} onChange={ownerChanged}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    addOwner();
+                                }
                             }}
                         />
+                        {!validation.owner && <Form.Text muted>Maximum 20 owners</Form.Text>}
+                        {validation.owner && <Form.Control.Feedback type='invalid'>{validation.owner}</Form.Control.Feedback>}
+                        {owners.length > 0 && (
+                            <Table striped bordered hover size='sm' style={{ marginTop: '10px' }}>
+                                <tbody>
+                                    {owners.map(o => <tr key={o}>
+                                        <td><small>{o}</small></td>
+                                        <td><Button size='sm' variant='danger' onClick={() => {
+                                            deleteOwner(o)
+                                        }}>X</Button> </td>
+                                    </tr>)}
+                                </tbody>
+                            </Table>
+                        )}
                     </Form.Group>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <Button variant="primary" onClick={deploy}>Deploy</Button>
-                    </div>
+                    <Form.Group controlId='threshold'>
+                        <Form.Label>Confirmation threshold</Form.Label>
+                        <Form.Control
+                            isInvalid={validation.threshold}
+                            type='number'
+                            value={threshold}
+                            min={1}
+                            max={20}
+                            onChange={thresholdChanged}
+                        />
+                        {validation.threshold && <Form.Control.Feedback type='invalid'>{validation.threshold}</Form.Control.Feedback>}
+                    </Form.Group>
+                    <Button variant='primary' onClick={deploy}>Deploy</Button>
                 </Form>
             </div>
-            <div className="deployer-code">
+            <div className='deployer-code'>
                 <Editor
-                    theme="vs-dark"
+                    theme='vs-dark'
                     defaultValue={code}
                     value={code}
-                   
                 />
             </div>
         </div>

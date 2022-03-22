@@ -4,7 +4,7 @@ import { useUpdateAtom } from 'jotai/utils';
 import { AppConfig, UserSession } from '@stacks/connect-react';
 import { showConnect } from '@stacks/connect';
 
-const appConfig = new AppConfig(['store_write', 'publish_data']);
+const appConfig = new AppConfig(['store_write', 'publish_data'], document.location.href);
 
 export const userSessionState = atom(new UserSession({ appConfig }));
 export const userDataState = atom();
@@ -22,14 +22,13 @@ export const useConnect = () => {
   };
 
   const authOptions = {
-    authOrigin: window.origin,
     onFinish,
     userSession,
     redirectTo: "/",
     manifestPath: "/manifest.json",
     appDetails: {
       name: "MultiSafe Deployer",
-      icon: "/logo.png",
+      icon: "/logo400.png",
     },
   };
 

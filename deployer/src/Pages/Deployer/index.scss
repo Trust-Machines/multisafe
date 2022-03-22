@@ -6,7 +6,8 @@
 
     .deployer-nav {
         height: 60px;
-        background: #000;
+        background: rgb(0,0,0);
+        background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(30,30,30,1) 100%);
         display: flex;
         align-items: center;
         justify-content: space-between;
