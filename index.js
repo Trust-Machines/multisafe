@@ -1,5 +1,6 @@
 const TRAIT_BASE = {
-    MAINNET: "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits"
+    MAINNET: "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits",
+    TESTNET: "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits"
 };
 
 function makeTraits(code){
@@ -17,5 +18,6 @@ function makeSafeContract (code, owners, minRequirement){
 
 module.exports = {
     makeSafeContract,
-    TRAIT_BASE
+    TRAIT_BASE,
+    MAX_OWNERS: 20
 }
