@@ -21,7 +21,7 @@ function Deployer({ userData }) {
     const { doContractDeploy } = useConnect();
 
     const [name, setName] = useState('');
-    const [network, setNetwork] = useState('testnet');
+    const [network, setNetwork] = useState('mainnet');
     const [owners, setOwners] = useState([]);
     const [owner, setOwner] = useState('');
     const [threshold, setThreshold] = useState(2);
