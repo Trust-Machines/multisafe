@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Form, Button, Table } from 'react-bootstrap';
+import Editor, { Monaco } from '@monaco-editor/react';
 
 import { validateStacksAddress } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { useConnect } from '@stacks/connect-react';
 
-import Editor, { Monaco } from '@monaco-editor/react';
 
 import { makeSafeContract } from 'multisafe-contracts';
 import safe from 'multisafe-contracts/contracts/safe.clar';
@@ -191,6 +191,13 @@ function Deployer({ userData }) {
                     theme='vs-dark'
                     defaultValue={code}
                     value={code}
+                    options={{
+                        fontLigatures: true,
+                        fontSize: 14,
+                        minimap: {
+                            enabled: false,
+                        },
+                    }}
                 />
             </div>
         </div>
