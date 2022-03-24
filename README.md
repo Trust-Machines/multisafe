@@ -168,7 +168,7 @@ Assuming you are an owner — in this example, you will send 1000 uSTX from the 
 (contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe confirm u1 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe)
 ```
 
-MultiSafe now has -1000 STX, and wallet_7 +1000 STX 
+MultiSafe now has -1000 uSTX, and wallet_7 +1000 uSTX 
 
 ## API Reference
 
