@@ -142,7 +142,7 @@ If you are the wallet_3 owner (ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC) then t
 (stx-transfer? u5000 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe)
 ```
 
-`::get_assets_maps` will show you that the STX has been transfered into the .safe MultiSafe`
+`::get_assets_maps` will show you that the STX has been transfered into the .safe contract
 
 ## Send STX from MultiSafe to a new wallet 
 
@@ -150,7 +150,7 @@ In this example, using Clarinet console, we will send STX from MultiSafe to "wal
 
 1. Send STX to wallet_7 
 
-Assuming you are an owner — in this example, you will send 1000 STX from the MultisSafe to wallet_7 (ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ). 
+Assuming you are an owner — in this example, you will send 1000 uSTX from the MultisSafe to wallet_7 (ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ). 
 
 ```clarity
 (contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ u1000)
