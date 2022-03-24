@@ -46,13 +46,13 @@ $ git clone https://github.com/Trust-Machines/multisafe.git && cd multisafe
 2. Run the unit test to confirm all the tests passed and everything is working: 
 
 ```bash
-$ Clarinet test
+$ clarinet test
 ```
 
 3. Open the Clarinet console in order to interact with the contract 
 
 ```bash
-$ Clarinet console
+$ clarinet console
 ```
 
 ## Setup the first MultiSafe owners
