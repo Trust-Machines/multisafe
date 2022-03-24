@@ -15,7 +15,7 @@ Future updates (coming soon):
 
 ## App UI 
 
-https://multisafe-app-alpha.vercel.app/
+https://app.multisafe.xyz/
 
 ## Security
 
