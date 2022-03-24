@@ -13,7 +13,19 @@ Future updates (coming soon):
 - SIP-009 Non-fungible token and SIP-010 Fungible token support 
 - Native Bitcoin (BTC) support
 
-## Requires Clarinet 
+## App UI 
+
+https://multisafe-app-alpha.vercel.app/
+
+## Security
+
+* Please be aware that the code hasn't audited by a independent security team yet. Use at your own risk. 
+* We are planning a security audit for June 2022
+* We would love your help testing our code. Please report any bugs as a Github issue. 
+
+## Clarity Usage  
+
+### Requires Clarinet 
 
 Install Clarinet: https://github.com/hirosystems/clarinet
 
@@ -23,7 +35,7 @@ MultiSafe is written in Clarity and therefore requires you to install Clarient l
 $ clarinet --version
 ```
 
-## Download MultiSafe  
+### Download MultiSafe  
 
 1. Clone the repo: 
 
@@ -42,8 +54,6 @@ $ Clarinet test
 ```bash
 $ Clarinet console
 ```
-
-# Usage 
 
 ## Setup the first MultiSafe owners
 
@@ -159,12 +169,6 @@ Assuming you are an owner — in this example, you will send 1000 STX from the M
 ```
 
 MultiSafe now has -1000 STX, and wallet_7 +1000 STX 
-
-## Security
-
-The code hasn't audited by a independent security team yet. Use at your own risk. 
-
-We are planning an audit for June 2022, and would love your help debugging the code prior to our audit. Please report any bugs as a Github Issue or on Twitter https://twitter.com/multisafexyz
 
 ## API Reference
 
