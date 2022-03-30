@@ -1,9 +1,12 @@
 
 export type NETWORK = "mainnet" | "testnet";
 
+export const MAINNET_DEPLOYER = "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7";
+export const TESTNET_DEPLOYER = "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK";
+
 const TRAIT_BASE = {
-    mainnet: "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits",
-    testnet: "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits"
+    mainnet: `${MAINNET_DEPLOYER}.multisafe-traits`,
+    testnet: `${TESTNET_DEPLOYER}.multisafe-traits`
 };
 
 export const MAX_OWNERS = 20;
