@@ -1,19 +1,19 @@
 
 export type NETWORK = "mainnet" | "testnet";
 
-export const NULL_ADDRESS = "SP000000000000000000002Q6VF78";
+export const NULL_ADDRESS: Record<NETWORK, string>  = {
+    mainnet: "SP000000000000000000002Q6VF78",
+    testnet: "ST000000000000000000002AMW42H"
+}
 
-const MAINNET_DEPLOYER = "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7";
-const TESTNET_DEPLOYER = "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK";
+export const DEPLOYER: Record<NETWORK, string>  = {
+    mainnet: "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7",
+    testnet: "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK"
+}
 
-const TRAIT_BASE = {
-    mainnet: `${MAINNET_DEPLOYER}.multisafe-traits`,
-    testnet: `${TESTNET_DEPLOYER}.multisafe-traits`
-};
-
-export const DEPLOYER = {
-    mainnet: MAINNET_DEPLOYER,
-    testnet: TESTNET_DEPLOYER
+const TRAIT_BASE: Record<NETWORK, string> = {
+    mainnet: `${DEPLOYER.mainnet}.multisafe-traits`,
+    testnet: `${DEPLOYER.testnet}.multisafe-traits`
 }
 
 export const MAX_OWNERS = 20;
