@@ -1,4 +1,4 @@
-# Multi-Safe
+# MultiSafe
 
 MultiSafe is a shared crypto wallet for managing Stacks (STX) and Bitcoin (BTC). 
 
