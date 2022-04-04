@@ -19,7 +19,7 @@ Future updates (coming soon):
 
 ## Security
 
-* Please be aware that the code hasn't audited by a independent security team yet. Use at your own risk. 
+* Please be aware that the code hasn't audited by an independent security team yet. Use at your own risk. 
 * We are planning a security audit for June 2022
 * We would love your help testing our code. Please report any bugs as a Github issue. 
 
