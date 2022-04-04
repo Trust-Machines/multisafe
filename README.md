@@ -2,6 +2,10 @@
 
 MultiSafe is a shared crypto wallet for managing Stacks (STX) and Bitcoin (BTC). 
 
+## Deploy a MultiSafe 
+
+https://app.multisafe.xyz/
+
 ## Features
 
 Current supported features: 
@@ -12,10 +16,6 @@ Future updates (coming soon):
 - User-friendly app 
 - SIP-009 Non-fungible token and SIP-010 Fungible token support 
 - Native Bitcoin (BTC) support
-
-## App UI 
-
-https://app.multisafe.xyz/
 
 ## Security
 
