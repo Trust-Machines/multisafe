@@ -197,6 +197,22 @@ Clarinet.test({
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "true");
 
+        // The transaction already confirmed. Should revert
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(0), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[2]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u180");
+
+
         // The transaction confirmed by sufficient number of owners.
         block = CHAIN.mineBlock([
             Tx.contractCall(

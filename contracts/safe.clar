@@ -242,6 +242,7 @@
                 (confirmations (get confirmations tx))
             )
 
+            (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
             (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
             
