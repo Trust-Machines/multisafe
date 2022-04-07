@@ -28,6 +28,7 @@
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
+(define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
 
 
 ;; Principal of deployed contract
@@ -125,6 +126,7 @@
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
+        (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
         (ok (set-min-confirmation-internal value))
     )
 )

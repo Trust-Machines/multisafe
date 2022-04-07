@@ -645,3 +645,54 @@ Clarinet.test({
         assertEquals(JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple())).confirmations, '[]');
     },
 });
+
+
+Clarinet.test({
+    name: "Set minimum confirmation - overflow protection test",
+    async fn() {
+        // Start a transaction to update minimum confirmation requirement.
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "submit",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), 
+                    types.uint(21)
+                ],
+                WALLETS[1]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "u6");
+
+        // // Owner 2 confirms.
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(6),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[2]
+              ),
+        ]);
+
+         // // Owner 3 confirms but tx reverted.
+         block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(6),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[3]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u220"); 
+    },
+});
