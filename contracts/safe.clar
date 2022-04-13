@@ -3,11 +3,11 @@
 ;;
 ;; Synopsis:
 ;; A multi-owner contract to manage Stacks Blockchain resources that requires n number of confirmations.
-;; Owners submit new transactions specifiying a target executor function of a smart contract that implements
+;; Owners submit new transactions specifying a target executor function of a smart contract that implements
 ;; executor-trait interface. The executor function gets triggered along with two parameters (param-p a principal 
-;; paramter and param-u an uint paramter) when the transaction receive sufficient number of confirmations from 
+;; parameter and param-u an uint parameter) when the transaction receive sufficient number of confirmations from 
 ;; owners. The target executor function can execute any kind of code with authority of the safe contract instance
-;; such as STX tranfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
+;; such as STX transfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
 (use-trait executor-trait .traits.executor-trait) 
