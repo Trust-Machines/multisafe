@@ -31,6 +31,7 @@ exports[`makeSafeContract mainnet 1`] = `
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
+(define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
 
 
 ;; Principal of deployed contract
@@ -128,6 +129,7 @@ exports[`makeSafeContract mainnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
+        (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
         (ok (set-min-confirmation-internal value))
     )
 )
@@ -243,6 +245,7 @@ exports[`makeSafeContract mainnet 1`] = `
                 (confirmations (get confirmations tx))
             )
 
+            (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
             (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
             
@@ -333,6 +336,7 @@ exports[`makeSafeContract testnet 1`] = `
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
+(define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
 
 
 ;; Principal of deployed contract
@@ -430,6 +434,7 @@ exports[`makeSafeContract testnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
+        (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
         (ok (set-min-confirmation-internal value))
     )
 )
@@ -545,6 +550,7 @@ exports[`makeSafeContract testnet 1`] = `
                 (confirmations (get confirmations tx))
             )
 
+            (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
             (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
             
