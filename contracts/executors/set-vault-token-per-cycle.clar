@@ -1,4 +1,4 @@
-;; Title: Multi-Safe contract ownership simulation executor
+;; Title: MultiSafe contract ownership simulation executor
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)

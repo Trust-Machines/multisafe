@@ -1,4 +1,4 @@
-;; Title: Multi-Safe minimum confirmation update executor
+;; Title: MultiSafe minimum confirmation update executor
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)

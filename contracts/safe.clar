@@ -1,4 +1,4 @@
-;; Title: Multi-Safe
+;; Title: MultiSafe
 ;; Author: Talha Bugra Bulut & Trust Machines
 ;;
 ;; Synopsis:

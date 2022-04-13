@@ -1,4 +1,4 @@
-;; Title: Multi-Safe traits
+;; Title: MultiSafe traits
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (define-trait safe-trait
