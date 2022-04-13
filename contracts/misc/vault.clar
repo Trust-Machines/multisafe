@@ -1,4 +1,4 @@
-;; Title: Multi-Safe example vault
+;; Title: MultiSafe example vault
 ;; Author: Talha Bugra Bulut & Trust Machines
 ;; 
 ;; Synopsis:

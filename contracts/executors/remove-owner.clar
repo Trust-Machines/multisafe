@@ -1,4 +1,4 @@
-;; Title: Multi-Safe remove owner executor
+;; Title: MultiSafe remove owner executor
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)
