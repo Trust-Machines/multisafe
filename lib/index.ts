@@ -23,6 +23,9 @@ function makeTraits(code: string, network: NETWORK) {
 }
 
 function makeInit(code: string, owners: string[], threshold: number) {
+    if (threshold > owners.length) {
+        throw new Error("Threshold cannot be higher than owner count");
+    }
     const init = `(init (list\n '${owners.join("\n '")} \n) u${threshold}) `;
     return code.replace(/\(init \(list((.|\n)*)\)/, init);
 }
