@@ -157,6 +157,7 @@
     uint 
     {
         executor: principal,
+        threshold: uint,
         confirmations: (list 20 principal),
         confirmed: bool,
         param-p: principal,
@@ -174,7 +175,14 @@
         (
             (tx-id (get-nonce))
         ) 
-        (map-insert transactions tx-id {executor: (contract-of executor), confirmations: (list), confirmed: false, param-p: param-p, param-u: param-u})
+        (map-insert transactions tx-id {
+            executor: (contract-of executor),
+            threshold: (var-get min-confirmation), 
+            confirmations: (list), 
+            confirmed: false,
+            param-p: param-p,
+            param-u: param-u
+        })
         (increase-nonce)
         tx-id
     )
@@ -252,7 +260,7 @@
             (let 
                 (
                     (new-confirmations (unwrap-panic (as-max-len? (append confirmations tx-sender) u20)))
-                    (confirmed (>= (len new-confirmations) (var-get min-confirmation)))
+                    (confirmed (>= (len new-confirmations) (get threshold tx)))
                     (new-tx (merge tx {confirmations: new-confirmations, confirmed: confirmed}))
                 )
                 (map-set transactions tx-id new-tx)
