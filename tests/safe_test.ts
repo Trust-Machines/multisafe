@@ -712,3 +712,50 @@ Clarinet.test({
         assertEquals(block.receipts[0].result.expectErr(), "u220"); 
     },
 });
+
+Clarinet.test({
+    name: "Set minimum confirmation - can't be higher than owner count",
+    async fn() {
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "submit",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), 
+                    types.uint(4)
+                ],
+                WALLETS[1]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "u7");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(7),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[2]
+              ),
+        ]);
+
+         block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(7),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[3]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u230"); 
+    },
+});
