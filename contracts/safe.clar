@@ -29,6 +29,7 @@
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
 (define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
+(define-constant ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS (err u230))
 
 
 ;; Principal of deployed contract
@@ -95,6 +96,7 @@
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
+        (asserts! (>= (- (len owners-list) u1) (var-get min-confirmation)) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
@@ -127,6 +129,7 @@
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
         (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
+        (asserts! (<= value (len (var-get owners))) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
         (ok (set-min-confirmation-internal value))
     )
 )
