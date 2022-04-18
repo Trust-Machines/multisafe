@@ -96,6 +96,7 @@
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
+        (asserts! (>= (- (len owners-list) u1) (var-get min-confirmation)) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )

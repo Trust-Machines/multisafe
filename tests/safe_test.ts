@@ -387,7 +387,7 @@ Clarinet.test({
         assertEquals(confirmations[1], WALLETS[1]);
         assertEquals(confirmations[2], WALLETS[2]);
      
-        // New owner should be added. Now we should have 4 owners.
+        // New owner should be added. Now we should have 3 owners.
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -754,6 +754,57 @@ Clarinet.test({
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
                 ],
                 WALLETS[3]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u230"); 
+    },
+});
+
+Clarinet.test({
+    name: "Remove an owner - owner count cant be lower than minimum confirmation",
+    async fn() {
+        // Start a new transaction to remove an owner.
+         let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "submit",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    types.principal(WALLETS[3]),
+                    types.uint(0)
+                ],
+                WALLETS[3]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "u8");
+
+        // Owner 2 confirms.
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(8),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[1]
+              ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "false");
+
+        // Owner 3 confirms.
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(8), 
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                ],
+                WALLETS[2]
               ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u230"); 
