@@ -29,7 +29,7 @@ Future updates (coming soon):
 
 Install Clarinet: https://github.com/hirosystems/clarinet
 
-MultiSafe is written in Clarity and therefore requires you to install Clarient locally on the command line. Type the following command to check that you have Clarinet installed: 
+MultiSafe is written in Clarity and therefore requires you to install Clarinet locally on the command line. Type the following command to check that you have Clarinet installed: 
 
 ```bash
 $ clarinet --version
@@ -57,7 +57,7 @@ $ clarinet console
 
 ## Setup the first MultiSafe owners
 
-Go to `/contracts/safe.clar`. At the bottom of that contract you'll see a list with three sample owners. These are the default Clarinet wallets that you can use for testing locally in Clarient.
+Go to `/contracts/safe.clar`. At the bottom of that contract you'll see a list with three sample owners. These are the default Clarinet wallets that you can use for testing locally in Clarinet.
 
 ```clarity
 (init (list 
