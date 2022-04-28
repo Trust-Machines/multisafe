@@ -12,6 +12,8 @@
 
 (use-trait executor-trait .traits.executor-trait) 
 (use-trait safe-trait .traits.safe-trait)
+(use-trait nft-trait .traits.sip-009-trait)
+(use-trait ft-trait .traits.sip-010-trait)
 
 (impl-trait .traits.safe-trait)
 
