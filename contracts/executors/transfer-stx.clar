@@ -4,6 +4,6 @@
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)
 (use-trait safe-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.safe-trait)
 
-(define-public (execute (safe <safe-trait>) (arg-p principal) (arg-u uint))
-		(stx-transfer? arg-u (contract-of safe) arg-p)
+(define-public (execute (safe <safe-trait>) (arg-p (optional principal)) (arg-u (optional uint)) (arg-b (optional (buff 20))))
+		(stx-transfer? (unwrap! arg-u (err u9999)) (contract-of safe) (unwrap! arg-p (err u9999)))
 )

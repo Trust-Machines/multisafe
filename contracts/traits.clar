@@ -11,7 +11,7 @@
 
 (define-trait executor-trait
 	(
-		(execute (<safe-trait> principal uint) (response bool uint))
+		(execute (<safe-trait> (optional principal) (optional uint) (optional (buff 20))) (response bool uint))
 	)
 )
 
