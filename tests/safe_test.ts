@@ -6,6 +6,9 @@ let CHAIN: Chain;
 let WALLETS:string[] = [];
 let DEPLOYER: string = "";
 
+const FT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none");
+const NFT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none");
+
 
 Clarinet.test({
     name: "Setup",
@@ -75,8 +78,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND"),
-                    types.uint(0)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND")),
+                    types.some(types.uint(0)),
+                    types.none()
                 ],
                 WALLETS[3]
               ),
@@ -91,6 +97,8 @@ Clarinet.test({
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[3]
               ),
@@ -127,8 +135,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal(WALLETS[3]),
-                    types.uint(0)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal(WALLETS[3])),
+                    types.some(types.uint(0)),
+                    types.none()
                 ],
                 WALLETS[0]
               ),
@@ -160,7 +171,9 @@ Clarinet.test({
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[0]
               ),
@@ -175,7 +188,9 @@ Clarinet.test({
                 [
                     types.uint(0),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[1]
               ),
@@ -190,7 +205,9 @@ Clarinet.test({
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[1]
               ),
@@ -205,7 +222,9 @@ Clarinet.test({
                 [
                     types.uint(0), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[2]
               ),
@@ -281,8 +300,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
-                    types.uint(3)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
+                    types.some(types.uint(3)),
+                    types.none()
                 ],
                 WALLETS[0]
               ),
@@ -297,7 +319,9 @@ Clarinet.test({
                 [
                     types.uint(1),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[1]
               ),
@@ -330,8 +354,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5"),
-                    types.uint(0)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5")),
+                    types.some(types.uint(0)),
+                    types.none()
                 ],
                 WALLETS[3]
               ),
@@ -346,7 +373,9 @@ Clarinet.test({
                 [
                     types.uint(2),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[1]
               ),
@@ -361,7 +390,9 @@ Clarinet.test({
                 [
                     types.uint(2), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[2]
               ),
@@ -403,6 +434,7 @@ Clarinet.test({
 });
 
 
+
 Clarinet.test({
     name: "Spend STX",
     async fn() {
@@ -415,8 +447,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
-                    types.uint(50000000)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6")),
+                    types.some(types.uint(50000000)),
+                    types.none()
                 ],
                 WALLETS[1]
               ),
@@ -431,7 +466,9 @@ Clarinet.test({
             [
                 types.uint(3), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                FT_NONE,
+                NFT_NONE,
             ],
             WALLETS[2]
           ), 
@@ -446,7 +483,9 @@ Clarinet.test({
                 [
                     types.uint(3),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[3]
             ),
@@ -497,8 +536,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), // TODO: Look for a zero address or dead address for Stacks chain.
-                    types.uint(1200)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")),
+                    types.some(types.uint(1200)),
+                    types.none()
                 ],
                 WALLETS[1]
               ),
@@ -513,7 +555,9 @@ Clarinet.test({
             [
                 types.uint(4), 
                 types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                FT_NONE,
+                NFT_NONE,
             ],
             WALLETS[2]
           ), 
@@ -528,7 +572,9 @@ Clarinet.test({
                 [
                     types.uint(4), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[3]
             ),
@@ -548,7 +594,6 @@ Clarinet.test({
     },
 });
 
-
 Clarinet.test({
     name: "List transactions by ids",
     async fn() {
@@ -565,7 +610,6 @@ Clarinet.test({
     },
 });
 
-
 Clarinet.test({
     name: "Get version",
     async fn() {
@@ -581,7 +625,6 @@ Clarinet.test({
         assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
     },
 });
-
 
 Clarinet.test({
     name: "Revoke",
@@ -618,8 +661,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6"),
-                    types.uint(50000000)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6")),
+                    types.some(types.uint(50000000)),
+                    types.none()
                 ],
                 WALLETS[1]
               ),
@@ -674,8 +720,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), 
-                    types.uint(21)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
+                    types.some(types.uint(21)),
+                    types.none()
                 ],
                 WALLETS[1]
               ),
@@ -690,7 +739,9 @@ Clarinet.test({
                 [
                     types.uint(6),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE
                 ],
                 WALLETS[2]
               ),
@@ -704,7 +755,9 @@ Clarinet.test({
                 [
                     types.uint(6),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE
                 ],
                 WALLETS[3]
               ),
@@ -723,8 +776,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"), 
-                    types.uint(4)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
+                    types.some(types.uint(4)),
+                    types.none()
                 ],
                 WALLETS[1]
               ),
@@ -738,7 +794,9 @@ Clarinet.test({
                 [
                     types.uint(7),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[2]
               ),
@@ -751,7 +809,9 @@ Clarinet.test({
                 [
                     types.uint(7),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[3]
               ),
@@ -759,6 +819,7 @@ Clarinet.test({
         assertEquals(block.receipts[0].result.expectErr(), "u230"); 
     },
 });
+
 
 Clarinet.test({
     name: "Remove an owner - owner count cant be lower than minimum confirmation",
@@ -771,8 +832,11 @@ Clarinet.test({
                 [
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    types.principal(WALLETS[3]),
-                    types.uint(0)
+                    FT_NONE,
+                    NFT_NONE,
+                    types.some(types.principal(WALLETS[3])),
+                    types.some(types.uint(0)),
+                    types.none()
                 ],
                 WALLETS[3]
               ),
@@ -787,7 +851,9 @@ Clarinet.test({
                 [
                     types.uint(8),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[1]
               ),
@@ -802,7 +868,9 @@ Clarinet.test({
                 [
                     types.uint(8), 
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe")
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
                 ],
                 WALLETS[2]
               ),

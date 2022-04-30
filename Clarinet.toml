@@ -37,6 +37,13 @@ depends_on = ["safe"]
 path = "contracts/executors/transfer-sip-009.clar"
 depends_on = ["safe"]
 
+[contracts.ft-none]
+path = "contracts/helper/ft-none.clar"
+depends_on = []
+
+[contracts.nft-none]
+path = "contracts/helper/nft-none.clar"
+depends_on = []
 
 [contracts.vault]
 path = "contracts/misc/vault.clar"
