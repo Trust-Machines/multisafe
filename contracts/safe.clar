@@ -155,6 +155,10 @@
 
 ;; --- Transactions
 
+;; It's not possible to get principal of an optional trait parameter using `contract-of` function.
+;; Also trait references cannot be stored on clarity contracts either.
+;; That's why we can't have optional `param-ft` and `param-nft` while having optional directives for `param-p`, `param-u` and `param-b`.
+
 (define-map transactions 
     uint 
     {
@@ -162,6 +166,8 @@
         threshold: uint,
         confirmations: (list 20 principal),
         confirmed: bool,
+        param-ft: principal,
+        param-nft: principal,
         param-p: (optional principal),
         param-u: (optional uint),
         param-b: (optional (buff 20))
@@ -170,11 +176,13 @@
 
 ;; Private function to insert a new transaction into transactions map
 ;; @params executor ; contract address to be executed
+;; @params param-ft ; Fungible token reference for token transfers
+;; @params param-nft ; Non-Fungible token reference for token transfers
 ;; @params param-p ; optional principal parameter to be passed to the executor function
 ;; @params param-u ; optional uint parameter to be passed to the executor function
 ;; @params param-b ; optional buffer parameter to be passed to the executor function
 ;; @returns uint
-(define-private (add (executor <executor-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
+(define-private (add (executor <executor-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (let 
         (
             (tx-id (get-nonce))
@@ -184,6 +192,8 @@
             threshold: (var-get min-confirmation), 
             confirmations: (list), 
             confirmed: false,
+            param-ft: (contract-of param-ft),
+            param-nft: (contract-of param-nft),
             param-p: param-p,
             param-u: param-u,
             param-b: param-b
@@ -247,8 +257,10 @@
 ;; @restricted to owners who hasn't confirmed the transaction yet
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
+;; @params param-ft ; Fungible token reference for token transfers
+;; @params param-nft ; Non-Fungible token reference for token transfers
 ;; @returns (response bool)
-(define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>))
+(define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
@@ -269,7 +281,7 @@
                     (new-tx (merge tx {confirmations: new-confirmations, confirmed: confirmed}))
                 )
                 (map-set transactions tx-id new-tx)
-                (and confirmed (try! (as-contract (contract-call? executor execute safe (get param-p tx) (get param-u tx) (get param-b tx)))))
+                (and confirmed (try! (as-contract (contract-call? executor execute safe param-ft param-nft (get param-p tx) (get param-u tx) (get param-b tx)))))
                 (print {action: "multisafe-confirmation", sender: tx-sender, tx-id: tx-id, confirmed: confirmed})
                 (ok confirmed)
             )
@@ -283,18 +295,20 @@
 ;; @restricted to owners
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
+;; @params param-ft ; Fungible token reference for token transfers
+;; @params param-nft ; Non-Fungible token reference for token transfers
 ;; @params param-p ; optional principal parameter to be passed to the executor function
 ;; @params param-u ; optional uint parameter to be passed to the executor function
 ;; @params param-u ; optional buffer parameter to be passed to the executor function
 ;; @returns (response uint)
-(define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
+(define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
-            ((tx-id (add executor param-p param-u param-b)))
-            (print {action: "multisafe-submit", sender: tx-sender, tx-id: tx-id, executor: executor, param-p: param-p, param-u: param-u, param-b: param-b})
-            (unwrap-panic (confirm tx-id executor safe))
+            ((tx-id (add executor param-ft param-nft param-p param-u param-b)))
+            (print {action: "multisafe-submit", sender: tx-sender, tx-id: tx-id, executor: executor, param-ft: param-ft, param-nft: param-nft, param-p: param-p, param-u: param-u, param-b: param-b})
+            (unwrap-panic (confirm tx-id executor safe param-ft param-nft))
             (ok tx-id)
         )
     )

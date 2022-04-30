@@ -9,12 +9,6 @@
 	)
 )
 
-(define-trait executor-trait
-	(
-		(execute (<safe-trait> (optional principal) (optional uint) (optional (buff 20))) (response bool uint))
-	)
-)
-
 (define-trait sip-009-trait
   (
     ;; Last token ID, limited to uint range
@@ -54,4 +48,10 @@
     ;; an optional URI that represents metadata of this token
     (get-token-uri () (response (optional (string-utf8 256)) uint))
   )
+)
+
+(define-trait executor-trait
+	(
+		(execute (<safe-trait> <sip-010-trait> <sip-009-trait> (optional principal) (optional uint) (optional (buff 20))) (response bool uint))
+	)
 )
