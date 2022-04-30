@@ -434,7 +434,6 @@ Clarinet.test({
 });
 
 
-
 Clarinet.test({
     name: "Spend STX",
     async fn() {
@@ -623,6 +622,26 @@ Clarinet.test({
         ]);
        
         assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
+    },
+});
+
+Clarinet.test({
+    name: "Get info",
+    async fn() {
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "get-info",
+                [],
+                WALLETS[0]
+              ),
+        ]);
+       
+        const json = JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple()));
+        assertEquals(json.version !== undefined, true);
+        assertEquals(json.owners !== undefined, true);
+        assertEquals(json["min-confirmation"] !== undefined, true);
+        assertEquals(json.nonce !== undefined, true);
     },
 });
 

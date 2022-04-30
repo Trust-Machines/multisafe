@@ -154,6 +154,19 @@
     (var-set nonce (+ (var-get nonce) u1))
 )
 
+
+;; --- Read all basic safe information at once
+
+(define-read-only (get-info)
+    {
+        version: (get-version),
+        owners: (get-owners),
+        min-confirmation: (get-min-confirmation),
+        nonce: (get-nonce)
+    }
+)
+
+
 ;; --- Transactions
 
 ;; SOME NOTES ON DESIGN
