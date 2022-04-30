@@ -32,7 +32,8 @@
 (define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
 (define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
 (define-constant ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS (err u230))
-
+(define-constant ERR-TX-INVALID-FT (err u240))
+(define-constant ERR-TX-INVALID-NFT (err u250))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -155,6 +156,7 @@
 
 ;; --- Transactions
 
+;; SOME NOTES ON DESIGN
 ;; It's not possible to get principal of an optional trait parameter using `contract-of` function.
 ;; Also trait references cannot be stored on clarity contracts either.
 ;; That's why we can't have optional `param-ft` and `param-nft` while having optional directives for `param-p`, `param-u` and `param-b`.
@@ -176,8 +178,8 @@
 
 ;; Private function to insert a new transaction into transactions map
 ;; @params executor ; contract address to be executed
-;; @params param-ft ; Fungible token reference for token transfers
-;; @params param-nft ; Non-Fungible token reference for token transfers
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-Fungible token reference for token transfers
 ;; @params param-p ; optional principal parameter to be passed to the executor function
 ;; @params param-u ; optional uint parameter to be passed to the executor function
 ;; @params param-b ; optional buffer parameter to be passed to the executor function
@@ -257,8 +259,8 @@
 ;; @restricted to owners who hasn't confirmed the transaction yet
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
-;; @params param-ft ; Fungible token reference for token transfers
-;; @params param-nft ; Non-Fungible token reference for token transfers
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-fungible token reference for token transfers
 ;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
@@ -273,6 +275,8 @@
             (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
             (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
+            (asserts! (is-eq (get param-ft tx) (contract-of param-ft)) ERR-TX-INVALID-FT)
+            (asserts! (is-eq (get param-nft tx) (contract-of param-nft)) ERR-TX-INVALID-NFT)
             
             (let 
                 (
@@ -295,8 +299,8 @@
 ;; @restricted to owners
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
-;; @params param-ft ; Fungible token reference for token transfers
-;; @params param-nft ; Non-Fungible token reference for token transfers
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-Fungible token reference for token transfers
 ;; @params param-p ; optional principal parameter to be passed to the executor function
 ;; @params param-u ; optional uint parameter to be passed to the executor function
 ;; @params param-u ; optional buffer parameter to be passed to the executor function
