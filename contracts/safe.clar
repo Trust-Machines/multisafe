@@ -209,7 +209,7 @@
 ;; @params tx-id ; transaction id
 ;; @returns tuple
 (define-read-only (get-transaction (tx-id uint))
-    (unwrap-panic (map-get? transactions tx-id))
+    (merge {id: tx-id} (unwrap-panic (map-get? transactions tx-id)))
 )
 
 ;; Returns transactions by ids

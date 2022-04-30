@@ -605,7 +605,7 @@ Clarinet.test({
                 WALLETS[0]
               ),
         ]);
-
+ 
         assertEquals(block.receipts[0].result.expectList().length, 5); 
     },
 });
