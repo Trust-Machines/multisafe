@@ -29,6 +29,10 @@ depends_on = ["safe"]
 path = "contracts/executors/transfer-stx.clar"
 depends_on = ["safe"]
 
+[contracts.transfer-sip-010]
+path = "contracts/executors/transfer-sip-010.clar"
+depends_on = ["safe"]
+
 [contracts.vault]
 path = "contracts/misc/vault.clar"
 depends_on = []
