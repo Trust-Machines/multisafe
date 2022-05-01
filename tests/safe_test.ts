@@ -81,7 +81,7 @@ Clarinet.test({
                     FT_NONE,
                     NFT_NONE,
                     types.some(types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND")),
-                    types.some(types.uint(0)),
+                    types.none(),
                     types.none()
                 ],
                 WALLETS[3]
@@ -138,7 +138,7 @@ Clarinet.test({
                     FT_NONE,
                     NFT_NONE,
                     types.some(types.principal(WALLETS[3])),
-                    types.some(types.uint(0)),
+                    types.none(),
                     types.none()
                 ],
                 WALLETS[0]
@@ -357,7 +357,7 @@ Clarinet.test({
                     FT_NONE,
                     NFT_NONE,
                     types.some(types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5")),
-                    types.some(types.uint(0)),
+                    types.none(),
                     types.none()
                 ],
                 WALLETS[3]
@@ -854,7 +854,7 @@ Clarinet.test({
                     FT_NONE,
                     NFT_NONE,
                     types.some(types.principal(WALLETS[3])),
-                    types.some(types.uint(0)),
+                    types.none(),
                     types.none()
                 ],
                 WALLETS[3]
