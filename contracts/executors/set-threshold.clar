@@ -1,4 +1,4 @@
-;; Title: MultiSafe contract ownership simulation executor
+;; Title: MultiSafe minimum confirmation update executor
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)
@@ -7,5 +7,5 @@
 (use-trait ft-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.sip-010-trait)
 
 (define-public (execute (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
-	  (contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.vault set-token-per-cycle (unwrap! param-u (err u9999)))
+		(contract-call? safe set-threshold (unwrap! param-u (err u9999)))
 )

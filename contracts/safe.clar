@@ -12,6 +12,8 @@
 
 (use-trait executor-trait .traits.executor-trait) 
 (use-trait safe-trait .traits.safe-trait)
+(use-trait nft-trait .traits.sip-009-trait)
+(use-trait ft-trait .traits.sip-010-trait)
 
 (impl-trait .traits.safe-trait)
 
@@ -27,10 +29,11 @@
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
-(define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
-(define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
-(define-constant ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS (err u230))
-
+(define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
+(define-constant ERR-THRESHOLD-OVERFLOW (err u220))
+(define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
+(define-constant ERR-TX-INVALID-FT (err u240))
+(define-constant ERR-TX-INVALID-NFT (err u250))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -38,7 +41,7 @@
 ;; --- Version
 
 ;; Version string
-(define-constant VERSION "0.0.1.alpha")
+(define-constant VERSION "0.0.2.alpha")
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
@@ -96,41 +99,41 @@
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
-        (asserts! (>= (- (len owners-list) u1) (var-get min-confirmation)) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
+        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW-OWNERS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
 )
 
 
-;; --- Minimum confirmation requirement 
+;; --- Minimum confirmation threshold 
 
-(define-data-var min-confirmation uint u0)
+(define-data-var threshold uint u0)
 
-;; Returns minimum confirmation
+;; Returns confirmation threshold
 ;; @returns uint 
-(define-read-only (get-min-confirmation)
-    (var-get min-confirmation)
+(define-read-only (get-threshold)
+    (var-get threshold)
 )
 
-;; Private function to set minimum required confirmation number
+;; Private function to set confirmation threshold
 ;; @params value
 ;; return bool
-(define-private (set-min-confirmation-internal (value uint))
-    (var-set min-confirmation value)
+(define-private (set-threshold-internal (value uint))
+    (var-set threshold value)
 )
 
-;; Updates minimum required confirmation number
+;; Updates minimum confirmation threshold
 ;; @restricted to SELF
 ;; @params value
 ;; @returns (response bool)
-(define-public (set-min-confirmation (value uint))
+(define-public (set-threshold (value uint))
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
-        (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
-        (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
-        (asserts! (<= value (len (var-get owners))) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
-        (ok (set-min-confirmation-internal value))
+        (asserts! (> value u0) ERR-THRESHOLD-CANT-BE-ZERO)
+        (asserts! (<= value u20) ERR-THRESHOLD-OVERFLOW)
+        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (ok (set-threshold-internal value))
     )
 )
 
@@ -151,7 +154,25 @@
     (var-set nonce (+ (var-get nonce) u1))
 )
 
+
+;; --- Read all basic safe information at once
+
+(define-read-only (get-info)
+    {
+        version: (get-version),
+        owners: (get-owners),
+        threshold: (get-threshold),
+        nonce: (get-nonce)
+    }
+)
+
+
 ;; --- Transactions
+
+;; SOME NOTES ON DESIGN
+;; It's not possible to get principal of an optional trait parameter using `contract-of` function.
+;; Also trait references cannot be stored on clarity contracts either.
+;; That's why we can't have optional `param-ft` and `param-nft` while having optional directives for `param-p`, `param-u` and `param-b`.
 
 (define-map transactions 
     uint 
@@ -160,28 +181,37 @@
         threshold: uint,
         confirmations: (list 20 principal),
         confirmed: bool,
-        param-p: principal,
-        param-u: uint
+        param-ft: principal,
+        param-nft: principal,
+        param-p: (optional principal),
+        param-u: (optional uint),
+        param-b: (optional (buff 20))
     }
 )
 
 ;; Private function to insert a new transaction into transactions map
 ;; @params executor ; contract address to be executed
-;; @params param-p ; principal parameter to be passed to the executor function
-;; @params param-u ; uint argument to be passed to the executor function
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-Fungible token reference for token transfers
+;; @params param-p ; optional principal parameter to be passed to the executor function
+;; @params param-u ; optional uint parameter to be passed to the executor function
+;; @params param-b ; optional buffer parameter to be passed to the executor function
 ;; @returns uint
-(define-private (add (executor <executor-trait>) (param-p principal) (param-u uint))
+(define-private (add (executor <executor-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (let 
         (
             (tx-id (get-nonce))
         ) 
         (map-insert transactions tx-id {
             executor: (contract-of executor),
-            threshold: (var-get min-confirmation), 
+            threshold: (var-get threshold), 
             confirmations: (list), 
             confirmed: false,
+            param-ft: (contract-of param-ft),
+            param-nft: (contract-of param-nft),
             param-p: param-p,
-            param-u: param-u
+            param-u: param-u,
+            param-b: param-b
         })
         (increase-nonce)
         tx-id
@@ -192,7 +222,7 @@
 ;; @params tx-id ; transaction id
 ;; @returns tuple
 (define-read-only (get-transaction (tx-id uint))
-    (unwrap-panic (map-get? transactions tx-id))
+    (merge {id: tx-id} (unwrap-panic (map-get? transactions tx-id)))
 )
 
 ;; Returns transactions by ids
@@ -242,8 +272,10 @@
 ;; @restricted to owners who hasn't confirmed the transaction yet
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-fungible token reference for token transfers
 ;; @returns (response bool)
-(define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>))
+(define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
@@ -256,6 +288,8 @@
             (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
             (asserts! (is-none (index-of confirmations tx-sender)) ERR-TX-ALREADY-CONFIRMED-BY-OWNER)
             (asserts! (is-eq (get executor tx) (contract-of executor)) ERR-TX-INVALID-EXECUTOR)
+            (asserts! (is-eq (get param-ft tx) (contract-of param-ft)) ERR-TX-INVALID-FT)
+            (asserts! (is-eq (get param-nft tx) (contract-of param-nft)) ERR-TX-INVALID-NFT)
             
             (let 
                 (
@@ -264,7 +298,7 @@
                     (new-tx (merge tx {confirmations: new-confirmations, confirmed: confirmed}))
                 )
                 (map-set transactions tx-id new-tx)
-                (and confirmed (try! (as-contract (contract-call? executor execute safe (get param-p tx) (get param-u tx)))))
+                (and confirmed (try! (as-contract (contract-call? executor execute safe param-ft param-nft (get param-p tx) (get param-u tx) (get param-b tx)))))
                 (print {action: "multisafe-confirmation", sender: tx-sender, tx-id: tx-id, confirmed: confirmed})
                 (ok confirmed)
             )
@@ -278,17 +312,20 @@
 ;; @restricted to owners
 ;; @params executor ; contract address to be executed
 ;; @params safe ; address of safe instance / SELF
-;; @params param-p ; principal parameter to be passed to the executor function
-;; @params param-u ; uint argument to be passed to the executor function
+;; @params param-ft ; fungible token reference for token transfers
+;; @params param-nft ; non-Fungible token reference for token transfers
+;; @params param-p ; optional principal parameter to be passed to the executor function
+;; @params param-u ; optional uint parameter to be passed to the executor function
+;; @params param-u ; optional buffer parameter to be passed to the executor function
 ;; @returns (response uint)
-(define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-p principal) (param-u uint))
+(define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
-            ((tx-id (add executor param-p param-u)))
-            (print {action: "multisafe-submit", sender: tx-sender, tx-id: tx-id, executor: executor, param-p: param-p, param-u: param-u})
-            (unwrap-panic (confirm tx-id executor safe))
+            ((tx-id (add executor param-ft param-nft param-p param-u param-b)))
+            (print {action: "multisafe-submit", sender: tx-sender, tx-id: tx-id, executor: executor, param-ft: param-ft, param-nft: param-nft, param-p: param-p, param-u: param-u, param-b: param-b})
+            (unwrap-panic (confirm tx-id executor safe param-ft param-nft))
             (ok tx-id)
         )
     )
@@ -301,7 +338,7 @@
 (define-private (init (o (list 20 principal)) (m uint))
     (begin
         (map add-owner-internal o)
-        (set-min-confirmation-internal m)
+        (set-threshold-internal m)
         (print {action: "multisafe-init"})
     )
 )

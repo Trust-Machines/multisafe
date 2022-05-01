@@ -80,17 +80,17 @@ In the example above `ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe` is your sa
 
 `get-owners` will return `[ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC]`
 
-## Get minimum confirmations 
+## Get confirmation threshold
 
 ```clarity
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe get-min-confirmation)
+(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe get-threshold)
 ```
 
 The Clarinet console demo will return `u2`
 
 In this example “u2” tells us that we need a minimum of 2 confirmations in order to approve a transaction 
 
-## Add new users 
+## Add new owners 
 
 1. Change the transaction sender to “wallet_1”
 
@@ -101,7 +101,7 @@ In this example “u2” tells us that we need a minimum of 2 confirmations in o
 2. Add a new user to the wallet. In this example, we add “wallet_9” to MultiSafe. 
 
 ```clarity
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6 u0)
+(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none (some 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6) none none)
 ```
 ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM = deployer 
 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6 = wallet_9
@@ -123,7 +123,7 @@ Returns: `[ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, ST2CY5V39NHDPWSXMW9QDT3HC3
 5. As wallet_2 owner, now you can approve the 4th new owner 
 
 ```clarity
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe)
+(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe confirm u0 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none)
 ```
 
 6. Call “get-owners” again and you will see the 4th owner has been added 
@@ -153,7 +153,8 @@ In this example, using Clarinet console, we will send STX from MultiSafe to "wal
 Assuming you are an owner — in this example, you will send 1000 uSTX from the MultisSafe to wallet_7 (ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ). 
 
 ```clarity
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ u1000)
+(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe submit 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 
+'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none (some 'ST3PF13W7Z0RRM42A8VZRVFQ75SV1K26RXEP8YGKJ) (some u1000) none)
 ```
 
 2. Change owner to wallet_2
@@ -165,7 +166,7 @@ Assuming you are an owner — in this example, you will send 1000 uSTX from the 
 3. Wallet_2 can now confirm the transaction 
 
 ```clarity
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe confirm u1 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe)
+(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe confirm u1 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none)
 ```
 
 MultiSafe now has -1000 uSTX, and wallet_7 +1000 uSTX 
@@ -176,9 +177,9 @@ MultiSafe now has -1000 uSTX, and wallet_7 +1000 uSTX
 
 The following function can be run by only safe owners:
 
-`submit (executor <executor-trait>, safe <safe-trait>, param-p principal, param-u uint) => (response uint)`
+`submit (executor <executor-trait>, safe <safe-trait>, param-ft <ft-trait>, param-nft <nft-trait>, param-p (optional principal), param-u (optional uint), param-b (optional (buff 20))) => (response uint)`
 
-`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>) => (response bool)`
+`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>, param-ft <ft-trait>, param-nft <nft-trait>) => (response bool)`
 
 `revoke (tx-id uint) => (response bool)`
 
@@ -190,7 +191,7 @@ The following functions can be run by only safe contract itself and requires the
 
 `remove-owner (owner principal) => (response bool)`
 
-`set-min-confirmation (value uint) => (response bool)`
+`set-threshold (value uint) => (response bool)`
 
 ### Views (Read only functions)
 
@@ -198,9 +199,11 @@ The following functions can be run by only safe contract itself and requires the
 
 `get-owners() => list`
 
-`get-min-confirmation() => uint`
+`get-threshold() => uint`
 
 `get-nonce() => uint`
+
+`get-info() => tuple`
 
 `get-transaction (tx-id uint) => tuple`
 
