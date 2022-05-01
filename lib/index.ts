@@ -1,11 +1,6 @@
 
 export type NETWORK = "mainnet" | "testnet";
 
-export const NULL_ADDRESS: Record<NETWORK, string>  = {
-    mainnet: "SP000000000000000000002Q6VF78",
-    testnet: "ST000000000000000000002AMW42H"
-}
-
 export const DEPLOYER: Record<NETWORK, string>  = {
     mainnet: "SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7",
     testnet: "ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK"
