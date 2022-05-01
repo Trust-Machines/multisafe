@@ -21,8 +21,8 @@ depends_on = ["safe"]
 path = "contracts/executors/remove-owner.clar"
 depends_on = ["safe"]
 
-[contracts.set-min-confirmation]
-path = "contracts/executors/set-min-confirmation.clar"
+[contracts.set-threshold]
+path = "contracts/executors/set-threshold.clar"
 depends_on = ["safe"]
 
 [contracts.transfer-stx]

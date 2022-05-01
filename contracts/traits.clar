@@ -5,7 +5,7 @@
 	(
 		(add-owner (principal) (response bool uint))
 		(remove-owner (principal) (response bool uint))
-		(set-min-confirmation (uint) (response bool uint))
+		(set-threshold (uint) (response bool uint))
 	)
 )
 

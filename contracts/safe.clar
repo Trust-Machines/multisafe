@@ -29,9 +29,9 @@
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
-(define-constant ERR-MIN-CONFIRMATION-CANT-BE-ZERO (err u210))
-(define-constant ERR-MIN-CONFIRMATION-OVERFLOW (err u220))
-(define-constant ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS (err u230))
+(define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
+(define-constant ERR-THRESHOLD-OVERFLOW (err u220))
+(define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
 
@@ -99,41 +99,41 @@
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
         (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
-        (asserts! (>= (- (len owners-list) u1) (var-get min-confirmation)) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
+        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW-OWNERS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
 )
 
 
-;; --- Minimum confirmation requirement 
+;; --- Minimum confirmation threshold 
 
-(define-data-var min-confirmation uint u0)
+(define-data-var threshold uint u0)
 
-;; Returns minimum confirmation
+;; Returns confirmation threshold
 ;; @returns uint 
-(define-read-only (get-min-confirmation)
-    (var-get min-confirmation)
+(define-read-only (get-threshold)
+    (var-get threshold)
 )
 
-;; Private function to set minimum required confirmation number
+;; Private function to set confirmation threshold
 ;; @params value
 ;; return bool
-(define-private (set-min-confirmation-internal (value uint))
-    (var-set min-confirmation value)
+(define-private (set-threshold-internal (value uint))
+    (var-set threshold value)
 )
 
-;; Updates minimum required confirmation number
+;; Updates minimum confirmation threshold
 ;; @restricted to SELF
 ;; @params value
 ;; @returns (response bool)
-(define-public (set-min-confirmation (value uint))
+(define-public (set-threshold (value uint))
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
-        (asserts! (> value u0) ERR-MIN-CONFIRMATION-CANT-BE-ZERO)
-        (asserts! (<= value u20) ERR-MIN-CONFIRMATION-OVERFLOW)
-        (asserts! (<= value (len (var-get owners))) ERR-MIN-CONFIRMATION-OVERFLOW-OWNERS)
-        (ok (set-min-confirmation-internal value))
+        (asserts! (> value u0) ERR-THRESHOLD-CANT-BE-ZERO)
+        (asserts! (<= value u20) ERR-THRESHOLD-OVERFLOW)
+        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (ok (set-threshold-internal value))
     )
 )
 
@@ -161,7 +161,7 @@
     {
         version: (get-version),
         owners: (get-owners),
-        min-confirmation: (get-min-confirmation),
+        threshold: (get-threshold),
         nonce: (get-nonce)
     }
 )
@@ -204,7 +204,7 @@
         ) 
         (map-insert transactions tx-id {
             executor: (contract-of executor),
-            threshold: (var-get min-confirmation), 
+            threshold: (var-get threshold), 
             confirmations: (list), 
             confirmed: false,
             param-ft: (contract-of param-ft),
@@ -338,7 +338,7 @@
 (define-private (init (o (list 20 principal)) (m uint))
     (begin
         (map add-owner-internal o)
-        (set-min-confirmation-internal m)
+        (set-threshold-internal m)
         (print {action: "multisafe-init"})
     )
 )
