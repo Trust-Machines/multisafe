@@ -31,7 +31,7 @@ const submitTx = (executor: any, paramP: string | null, paramU: number | null, t
             ],
             txSender
         ),
-    ]);
+    ]).receipts[0].result;
 }
 
 const addOwner = (newOwner: string, txSender: string) => {
@@ -64,7 +64,7 @@ const confirm = (txId: number, executor: any, txSender: string) => {
             ],
             txSender
         ),
-    ]);
+    ]).receipts[0].result;
 }
 
 const revoke = (txId: number, txSender: string) => {
@@ -75,7 +75,7 @@ const revoke = (txId: number, txSender: string) => {
             [types.uint(txId)],
             txSender
         ),
-    ]);
+    ]).receipts[0].result;
 }
 
 const getOwners = () => {
@@ -190,11 +190,11 @@ Clarinet.test({
 Clarinet.test({
     name: "Onwer only checks",
     async fn() {
-        let block = addOwner("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");
+        let resp = addOwner("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
+        assertEquals(resp.expectErr(), "u130");
 
-        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");
+        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[3]);
+        assertEquals(resp.expectErr(), "u130");
     },
 });
 
@@ -210,8 +210,8 @@ Clarinet.test({
         assertEquals(owners[2], WALLETS[2]);
 
         // Start a new transaction to add a new owner.
-        let block = addOwner(WALLETS[3], WALLETS[0]);
-        assertEquals(block.receipts[0].result.expectOk(), "u0");
+        let resp = addOwner(WALLETS[3], WALLETS[0]);
+        assertEquals(resp.expectOk(), "u0");
 
         // The new transaction should be available in the transacions mapping.
         let tx: any = getTransaction(0);
@@ -223,21 +223,20 @@ Clarinet.test({
         assertEquals(confirmations[0], WALLETS[0]);
 
         // The user already confirmed transaction by submitting it. Should revert.
-        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[0]);
-        assertEquals(block.receipts[0].result.expectErr(), "u150");
+        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[0]);
+        assertEquals(resp.expectErr(), "u150");
 
         // Executor should be passed properly. Should revert.
-        block = confirm(0, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectErr(), "u160");
+        resp = confirm(0, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectErr(), "u160");
 
         // Owner 2 confirms.
-        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "true");
+        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "true");
 
         // The transaction already confirmed. Should revert
-        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectErr(), "u180");
-
+        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectErr(), "u180");
 
         // The transaction confirmed by sufficient number of owners.
         tx = getTransaction(0);
@@ -268,12 +267,12 @@ Clarinet.test({
         assertEquals(threshold, "u2");
 
         // Start a transaction to update minimum confirmation requirement.
-        let block = setThreshold(3, WALLETS[0]);
-        assertEquals(block.receipts[0].result.expectOk(), "u1");
+        let resp = setThreshold(3, WALLETS[0]);
+        assertEquals(resp.expectOk(), "u1");
 
         // // Owner 2 confirms. Confirmed.
-        block = confirm(1, THRESHOLD_EXECUTOR, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "true");
+        resp = confirm(1, THRESHOLD_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "true");
 
         // Minimum confirmation requirement should be updated as 3.
         threshold = getThreshold();
@@ -286,16 +285,16 @@ Clarinet.test({
     name: "Remove an owner",
     async fn() {
         // Start a new transaction to remove an owner.
-        let block = removeOwner(WALLETS[0], WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectOk(), "u2");
+        let resp = removeOwner(WALLETS[0], WALLETS[3]);
+        assertEquals(resp.expectOk(), "u2");
 
         // Owner 2 confirms.
-        block = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "false");
+        resp = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms.
-        block = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectOk(), "true");
+        resp = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "true");
 
         // Confirmed.
         let tx: any = getTransaction(2);
@@ -318,16 +317,16 @@ Clarinet.test({
     name: "Spend STX",
     async fn() {
         // Start a new transaction to send STX from the safe to another account
-        let block = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "u3");
+        let resp = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
+        assertEquals(resp.expectOk(), "u3");
 
         // Owner 2 confirms.
-        block = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectOk(), "false");
+        resp = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms.
-        block = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectOk(), "true");
+        resp = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[3]);
+        assertEquals(resp.expectOk(), "true");
 
         // Confirmed. STX balance of the safe should be 0.
         const assetMap = CHAIN.getAssetsMaps();
@@ -488,24 +487,24 @@ Clarinet.test({
     async fn() {
 
         // Tx not exists.
-        let block = revoke(10, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectErr(), 'u140');
+        let resp = revoke(10, WALLETS[2]);
+        assertEquals(resp.expectErr(), 'u140');
 
         // Tx already confirmed.
-        block = revoke(4, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectErr(), 'u180');
+        resp = revoke(4, WALLETS[2]);
+        assertEquals(resp.expectErr(), 'u180');
 
         // Start a new tx.
-        block = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "u5");
+        resp = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
+        assertEquals(resp.expectOk(), "u5");
 
         // Should reject becuase the owner hasn't confirmed the tx.
-        block = revoke(5, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectErr(), 'u190');
+        resp = revoke(5, WALLETS[2]);
+        assertEquals(resp.expectErr(), 'u190');
 
         // Should revoke.
-        block = revoke(5, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), 'true');
+        resp = revoke(5, WALLETS[1]);
+        assertEquals(resp.expectOk(), 'true');
 
         // Confirmation should be removed.
         const tx = getTransaction(5);
@@ -518,15 +517,15 @@ Clarinet.test({
     name: "Set minimum confirmation - overflow protection test",
     async fn() {
         // Start a transaction to set threshold.
-        let block = setThreshold(21, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "u6");
+        let resp = setThreshold(21, WALLETS[1]);
+        assertEquals(resp.expectOk(), "u6");
 
         // Owner 2 confirms.
-        block = confirm(6, THRESHOLD_EXECUTOR, WALLETS[2]);
+        resp = confirm(6, THRESHOLD_EXECUTOR, WALLETS[2]);
 
         // Owner 3 confirms but reverted.
-        block = confirm(6, THRESHOLD_EXECUTOR, WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectErr(), "u220");
+        resp = confirm(6, THRESHOLD_EXECUTOR, WALLETS[3]);
+        assertEquals(resp.expectErr(), "u220");
     },
 });
 
@@ -534,15 +533,15 @@ Clarinet.test({
     name: "Set minimum confirmation - can't be higher than owner count",
     async fn() {
         // Start a transaction to set threshold.
-        let block = setThreshold(4, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "u7");
+        let resp = setThreshold(4, WALLETS[1]);
+        assertEquals(resp.expectOk(), "u7");
 
         // Owner 2 confirms.
-        block = confirm(7, THRESHOLD_EXECUTOR, WALLETS[2]);
+        resp = confirm(7, THRESHOLD_EXECUTOR, WALLETS[2]);
 
         // Owner 3 confirms but reverted.
-        block = confirm(7, THRESHOLD_EXECUTOR, WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectErr(), "u230");
+        resp = confirm(7, THRESHOLD_EXECUTOR, WALLETS[3]);
+        assertEquals(resp.expectErr(), "u230");
     },
 });
 
@@ -551,15 +550,15 @@ Clarinet.test({
     name: "Remove an owner - owner count cannot be lower than threshold",
     async fn() {
         // Start a new transaction to remove an owner.
-        let block = removeOwner(WALLETS[3], WALLETS[3]);
-        assertEquals(block.receipts[0].result.expectOk(), "u8");
+        let resp = removeOwner(WALLETS[3], WALLETS[3]);
+        assertEquals(resp.expectOk(), "u8");
 
         // Owner 2 confirms.
-        block = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
-        assertEquals(block.receipts[0].result.expectOk(), "false");
+        resp = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms but reverted.
-        block = block = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
-        assertEquals(block.receipts[0].result.expectErr(), "u230");
+        resp = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectErr(), "u230");
     },
 });
