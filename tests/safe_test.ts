@@ -58,7 +58,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
-                "set-min-confirmation",
+                "set-threshold",
                 [types.uint(1)],
                 WALLETS[2]
               ),
@@ -285,7 +285,7 @@ Clarinet.test({
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
-                "get-min-confirmation",
+                "get-threshold",
                 [],
                 WALLETS[0]
               ),
@@ -298,7 +298,7 @@ Clarinet.test({
                 "safe",
                 "submit",
                 [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
@@ -318,7 +318,7 @@ Clarinet.test({
                 "confirm",
                 [
                     types.uint(1),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
@@ -332,7 +332,7 @@ Clarinet.test({
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
-                "get-min-confirmation",
+                "get-threshold",
                 [],
                 WALLETS[0]
               ),
@@ -640,7 +640,7 @@ Clarinet.test({
         const json = JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple()));
         assertEquals(json.version !== undefined, true);
         assertEquals(json.owners !== undefined, true);
-        assertEquals(json["min-confirmation"] !== undefined, true);
+        assertEquals(json["threshold"] !== undefined, true);
         assertEquals(json.nonce !== undefined, true);
     },
 });
@@ -737,7 +737,7 @@ Clarinet.test({
                 "safe",
                 "submit",
                 [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
@@ -757,7 +757,7 @@ Clarinet.test({
                 "confirm",
                 [
                     types.uint(6),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE
@@ -773,7 +773,7 @@ Clarinet.test({
                 "confirm",
                 [
                     types.uint(6),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE
@@ -793,7 +793,7 @@ Clarinet.test({
                 "safe",
                 "submit",
                 [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
@@ -812,7 +812,7 @@ Clarinet.test({
                 "confirm",
                 [
                     types.uint(7),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
@@ -827,7 +827,7 @@ Clarinet.test({
                 "confirm",
                 [
                     types.uint(7),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-min-confirmation"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
                     NFT_NONE,
