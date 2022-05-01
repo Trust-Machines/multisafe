@@ -90,7 +90,7 @@ The Clarinet console demo will return `u2`
 
 In this example “u2” tells us that we need a minimum of 2 confirmations in order to approve a transaction 
 
-## Add new users 
+## Add new owners 
 
 1. Change the transaction sender to “wallet_1”
 
@@ -177,9 +177,9 @@ MultiSafe now has -1000 uSTX, and wallet_7 +1000 uSTX
 
 The following function can be run by only safe owners:
 
-`submit (executor <executor-trait>, safe <safe-trait>, param-p principal, param-u uint) => (response uint)`
+`submit (executor <executor-trait>, safe <safe-trait>, param-ft <ft-trait>, param-nft <nft-trait>, param-p (optional principal), param-u (optional uint), param-b (optional (buff 20))) => (response uint)`
 
-`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>) => (response bool)`
+`confirm (tx-id uint, executor <executor-trait>, safe <safe-trait>, param-ft <ft-trait>, param-nft <nft-trait>) => (response bool)`
 
 `revoke (tx-id uint) => (response bool)`
 
@@ -191,7 +191,7 @@ The following functions can be run by only safe contract itself and requires the
 
 `remove-owner (owner principal) => (response bool)`
 
-`set-min-confirmation (value uint) => (response bool)`
+`set-threshold (value uint) => (response bool)`
 
 ### Views (Read only functions)
 
@@ -199,9 +199,11 @@ The following functions can be run by only safe contract itself and requires the
 
 `get-owners() => list`
 
-`get-min-confirmation() => uint`
+`get-threshold() => uint`
 
 `get-nonce() => uint`
+
+`get-info() => tuple`
 
 `get-transaction (tx-id uint) => tuple`
 
