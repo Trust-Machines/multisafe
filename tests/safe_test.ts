@@ -3,18 +3,137 @@ import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
 
 let CHAIN: Chain;
-let WALLETS:string[] = [];
+let WALLETS: string[] = [];
 let DEPLOYER: string = "";
 
 const FT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none");
 const NFT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none");
 
+const SAFE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe");
+const ADD_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner");
+const REMOVE_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner");
+const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold");
+const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
+
+const submitTx = (executor: any, paramP: string | null, paramU: number | null, txSender: string) => {
+    return CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "submit",
+            [
+                executor,
+                SAFE,
+                FT_NONE,
+                NFT_NONE,
+                paramP ? types.some(types.principal(paramP)) : types.none(),
+                paramU ? types.some(types.uint(paramU)) : types.none(),
+                types.none()
+            ],
+            txSender
+        ),
+    ]);
+}
+
+const addOwner = (newOwner: string, txSender: string) => {
+    return submitTx(ADD_OWNER_EXECUTOR, newOwner, null, txSender);
+}
+
+const setThreshold = (threshold: number, txSender: string) => {
+    return submitTx(THRESHOLD_EXECUTOR, null, threshold, txSender);
+}
+
+const removeOwner = (owner: string, txSender: string) => {
+    return submitTx(REMOVE_OWNER_EXECUTOR, owner, null, txSender);
+}
+
+const transferStx = (recipient: string, amount: number, txSender: string) => {
+    return submitTx(TRANSFER_STX_EXECUTOR, recipient, amount, txSender);
+}
+
+const confirm = (txId: number, executor: any, txSender: string) => {
+    return CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "confirm",
+            [
+                types.uint(txId),
+                executor,
+                SAFE,
+                FT_NONE,
+                NFT_NONE,
+            ],
+            txSender
+        ),
+    ]);
+}
+
+const revoke = (txId: number, txSender: string) => {
+    return CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "revoke",
+            [types.uint(txId)],
+            txSender
+        ),
+    ]);
+}
+
+const getOwners = () => {
+    let block = CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "get-owners",
+            [],
+            WALLETS[0]
+        ),
+    ]);
+
+    return block.receipts[0].result.expectList();
+}
+
+const getNonce = () => {
+    const block = CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "get-nonce",
+            [],
+            WALLETS[0]
+        ),
+    ]);
+
+    return block.receipts[0].result;
+}
+
+const getThreshold = () => {
+    const block = CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "get-threshold",
+            [],
+            WALLETS[0]
+        ),
+    ]);
+    return block.receipts[0].result;
+}
+
+const getTransaction = (txId: number) => {
+    const block = CHAIN.mineBlock([
+        Tx.contractCall(
+            "safe",
+            "get-transaction",
+            [types.uint(txId)],
+            WALLETS[0]
+        ),
+    ]);
+
+    return block.receipts[0].result.expectTuple()
+}
 
 Clarinet.test({
     name: "Setup",
     async fn(chain: Chain, accounts: Map<string, Account>) {
         CHAIN = chain;
-        WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x+1}`)!.address);
+        WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x + 1}`)!.address);
         DEPLOYER = accounts.get('deployer')!.address
 
         // send some stx to the safe contract
@@ -23,7 +142,7 @@ Clarinet.test({
                 50000000,
                 "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe",
                 "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
-              ),
+            ),
         ]);
 
         const assetMap = CHAIN.getAssetsMaps();
@@ -41,7 +160,7 @@ Clarinet.test({
                 "add-owner",
                 [types.principal(WALLETS[3])],
                 WALLETS[0]
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u100");
 
@@ -51,7 +170,7 @@ Clarinet.test({
                 "remove-owner",
                 [types.principal(WALLETS[2])],
                 WALLETS[1]
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u100");
 
@@ -61,7 +180,7 @@ Clarinet.test({
                 "set-threshold",
                 [types.uint(1)],
                 WALLETS[2]
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u100");
     },
@@ -71,39 +190,11 @@ Clarinet.test({
 Clarinet.test({
     name: "Onwer only checks",
     async fn() {
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND")),
-                    types.none(),
-                    types.none()
-                ],
-                WALLETS[3]
-              ),
-        ]);
+        let block = addOwner("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
         assertEquals(block.receipts[0].result.expectErr(), "u130");
 
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(0), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[3]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");      
+        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[3]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
     },
 });
 
@@ -112,138 +203,45 @@ Clarinet.test({
     name: "Add a new owner",
     async fn() {
         // Check current owners. Should be 3.
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-owners",
-                [],
-                WALLETS[0]
-              ),
-        ]);
-
-        let owners = block.receipts[0].result.expectList()
+        let owners = getOwners();
         assertEquals(owners.length, 3);
         assertEquals(owners[0], WALLETS[0]);
         assertEquals(owners[1], WALLETS[1]);
         assertEquals(owners[2], WALLETS[2]);
 
         // Start a new transaction to add a new owner.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal(WALLETS[3])),
-                    types.none(),
-                    types.none()
-                ],
-                WALLETS[0]
-              ),
-        ]);
+        let block = addOwner(WALLETS[3], WALLETS[0]);
         assertEquals(block.receipts[0].result.expectOk(), "u0");
 
         // The new transaction should be available in the transacions mapping.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-transaction",
-                [types.uint(0)],
-                WALLETS[0]
-              ),
-        ]);
-
-        let tx:any = block.receipts[0].result.expectTuple()
+        let tx: any = getTransaction(0);
         let confirmations = tx.confirmations.expectList()
 
+        assertEquals(tx.id, "u0");
         assertEquals(tx.confirmed, "false");
         assertEquals(confirmations.length, 1);
         assertEquals(confirmations[0], WALLETS[0]);
 
         // The user already confirmed transaction by submitting it. Should revert.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(0), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[0]
-              ),
-        ]);
+        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[0]);
         assertEquals(block.receipts[0].result.expectErr(), "u150");
 
-        // Destination parameter should be passed properly. Should revert.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(0),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        // Executor should be passed properly. Should revert.
+        block = confirm(0, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectErr(), "u160");
-        
+
         // Owner 2 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(0), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "true");
 
         // The transaction already confirmed. Should revert
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(0), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[2]
-              ),
-        ]);
+        block = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectErr(), "u180");
 
 
         // The transaction confirmed by sufficient number of owners.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-transaction",
-                [types.uint(0)],
-                WALLETS[0]
-              ),
-        ]);
-
-        tx = block.receipts[0].result.expectTuple()
-        confirmations = tx.confirmations.expectList()
+        tx = getTransaction(0);
+        confirmations = tx.confirmations.expectList();
 
         assertEquals(tx.confirmed, "true");
         assertEquals(confirmations.length, 2);
@@ -251,93 +249,35 @@ Clarinet.test({
         assertEquals(confirmations[1], WALLETS[1]);
 
         // New owner should be added. should be 4.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-owners",
-                [],
-                WALLETS[0]
-              ),
-        ]);
-
-        owners = block.receipts[0].result.expectList()
+        owners = getOwners();
         assertEquals(owners.length, 4);
         assertEquals(owners[3], WALLETS[3]);
 
         // Nonce should be incremented.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-nonce",
-                [],
-                WALLETS[0]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result, "u1");
+        const nonce = getNonce();
+        assertEquals(nonce, "u1");
     },
 });
 
 
 Clarinet.test({
-    name: "Set minimum confirmation requirement",
+    name: "Set confirmation threshold",
     async fn() {
         // Check current value. should be 2.
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-threshold",
-                [],
-                WALLETS[0]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result, "u2");
+        let threshold = getThreshold();
+        assertEquals(threshold, "u2");
 
         // Start a transaction to update minimum confirmation requirement.
-         block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
-                    types.some(types.uint(3)),
-                    types.none()
-                ],
-                WALLETS[0]
-              ),
-        ]);
+        let block = setThreshold(3, WALLETS[0]);
         assertEquals(block.receipts[0].result.expectOk(), "u1");
 
-        // // Owner 2 confirms. The transaction confirmed.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(1),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        // // Owner 2 confirms. Confirmed.
+        block = confirm(1, THRESHOLD_EXECUTOR, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "true");
 
         // Minimum confirmation requirement should be updated as 3.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-threshold",
-                [],
-                WALLETS[0]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result, "u3");
+        threshold = getThreshold();
+        assertEquals(threshold, "u3");
     },
 });
 
@@ -345,71 +285,20 @@ Clarinet.test({
 Clarinet.test({
     name: "Remove an owner",
     async fn() {
-        
         // Start a new transaction to remove an owner.
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5")),
-                    types.none(),
-                    types.none()
-                ],
-                WALLETS[3]
-              ),
-        ]);
+        let block = removeOwner(WALLETS[0], WALLETS[3]);
         assertEquals(block.receipts[0].result.expectOk(), "u2");
 
         // Owner 2 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(2),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        block = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "false");
 
         // Owner 3 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(2), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[2]
-              ),
-        ]);
+        block = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectOk(), "true");
 
-        // The transaction confirmed.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-transaction",
-                [types.uint(2)],
-                WALLETS[0]
-              ),
-        ]);
-
-        let tx:any = block.receipts[0].result.expectTuple()
+        // Confirmed.
+        let tx: any = getTransaction(2);
         let confirmations = tx.confirmations.expectList()
 
         assertEquals(tx.confirmed, "true");
@@ -417,18 +306,9 @@ Clarinet.test({
         assertEquals(confirmations[0], WALLETS[3]);
         assertEquals(confirmations[1], WALLETS[1]);
         assertEquals(confirmations[2], WALLETS[2]);
-     
-        // New owner should be added. Now we should have 3 owners.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-owners",
-                [],
-                WALLETS[0]
-              ),
-        ]);
 
-        let owners = block.receipts[0].result.expectList()
+        // Owner should be removed. Now we should have 3 owners.
+        let owners = getOwners();
         assertEquals(owners.length, 3);
     },
 });
@@ -437,61 +317,19 @@ Clarinet.test({
 Clarinet.test({
     name: "Spend STX",
     async fn() {
-
         // Start a new transaction to send STX from the safe to another account
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6")),
-                    types.some(types.uint(50000000)),
-                    types.none()
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        let block = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "u3");
 
-       // Owner 2 confirms.
-       block = CHAIN.mineBlock([
-        Tx.contractCall(
-            "safe",
-            "confirm",
-            [
-                types.uint(3), 
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                FT_NONE,
-                NFT_NONE,
-            ],
-            WALLETS[2]
-          ), 
-        ]);
+        // Owner 2 confirms.
+        block = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectOk(), "false");
 
         // Owner 3 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(3),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[3]
-            ),
-        ]);
-        assertEquals(block.receipts[0].result.expectOk(), "true");      
-        
-        // The transaction confirmed. STX balance of the safe should be 0.
+        block = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[3]);
+        assertEquals(block.receipts[0].result.expectOk(), "true");
+
+        // Confirmed. STX balance of the safe should be 0.
         const assetMap = CHAIN.getAssetsMaps();
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 0);
     },
@@ -512,7 +350,7 @@ Clarinet.test({
                 "get-token-per-cycle",
                 [],
                 DEPLOYER
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result, "u100");
 
@@ -523,7 +361,7 @@ Clarinet.test({
                 "set-token-per-cycle",
                 [types.uint(500)],
                 DEPLOYER
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u900");
 
@@ -542,24 +380,24 @@ Clarinet.test({
                     types.none()
                 ],
                 WALLETS[1]
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "u4");
 
         // Owner 2 confirms.
-       block = CHAIN.mineBlock([
-        Tx.contractCall(
-            "safe",
-            "confirm",
-            [
-                types.uint(4), 
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
-                types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                FT_NONE,
-                NFT_NONE,
-            ],
-            WALLETS[2]
-          ), 
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "confirm",
+                [
+                    types.uint(4),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
+                    FT_NONE,
+                    NFT_NONE,
+                ],
+                WALLETS[2]
+            ),
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "false");
 
@@ -569,7 +407,7 @@ Clarinet.test({
                 "safe",
                 "confirm",
                 [
-                    types.uint(4), 
+                    types.uint(4),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-vault-token-per-cycle"),
                     types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
                     FT_NONE,
@@ -587,7 +425,7 @@ Clarinet.test({
                 "get-token-per-cycle",
                 [],
                 DEPLOYER
-              ),
+            ),
         ]);
         assertEquals(block.receipts[0].result, "u1200");
     },
@@ -600,12 +438,12 @@ Clarinet.test({
             Tx.contractCall(
                 "safe",
                 "get-transactions",
-                [types.list([types.uint(0), types.uint(1), types.uint(2), types.uint(3) , types.uint(4)])],
+                [types.list([types.uint(0), types.uint(1), types.uint(2), types.uint(3), types.uint(4)])],
                 WALLETS[0]
-              ),
+            ),
         ]);
- 
-        assertEquals(block.receipts[0].result.expectList().length, 5); 
+
+        assertEquals(block.receipts[0].result.expectList().length, 5);
     },
 });
 
@@ -618,9 +456,9 @@ Clarinet.test({
                 "get-version",
                 [],
                 WALLETS[0]
-              ),
+            ),
         ]);
-       
+
         assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
     },
 });
@@ -634,9 +472,9 @@ Clarinet.test({
                 "get-info",
                 [],
                 WALLETS[0]
-              ),
+            ),
         ]);
-       
+
         const json = JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple()));
         assertEquals(json.version !== undefined, true);
         assertEquals(json.owners !== undefined, true);
@@ -649,81 +487,29 @@ Clarinet.test({
     name: "Revoke",
     async fn() {
 
-        // Tx not exists
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "revoke",
-                [types.uint(10)],
-                WALLETS[0]
-              ),
-        ]);
+        // Tx not exists.
+        let block = revoke(10, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectErr(), 'u140');
 
-        // Tx already confirmed
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "revoke",
-                [types.uint(4)],
-                WALLETS[0]
-              ),
-        ]);
+        // Tx already confirmed.
+        block = revoke(4, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectErr(), 'u180');
 
-
-        // Start a new tx
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6")),
-                    types.some(types.uint(50000000)),
-                    types.none()
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        // Start a new tx.
+        block = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "u5");
 
-        // Should reject becuase the owner hasn't confirmed the tx
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "revoke",
-                [types.uint(5)],
-                WALLETS[0]
-              ),
-        ]);
+        // Should reject becuase the owner hasn't confirmed the tx.
+        block = revoke(5, WALLETS[2]);
         assertEquals(block.receipts[0].result.expectErr(), 'u190');
 
-        // should revoke
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "revoke",
-                [types.uint(5)],
-                WALLETS[1]
-              ),
-        ]);
+        // Should revoke.
+        block = revoke(5, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), 'true');
 
-        // confirmation should be removed
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "get-transaction",
-                [types.uint(5)],
-                WALLETS[0]
-              ),
-        ]);
-
-        assertEquals(JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple())).confirmations, '[]');
+        // Confirmation should be removed.
+        const tx = getTransaction(5);
+        assertEquals(JSON.parse(JSON.stringify(tx)).confirmations, '[]');
     },
 });
 
@@ -731,169 +517,49 @@ Clarinet.test({
 Clarinet.test({
     name: "Set minimum confirmation - overflow protection test",
     async fn() {
-        // Start a transaction to update minimum confirmation requirement.
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
-                    types.some(types.uint(21)),
-                    types.none()
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        // Start a transaction to set threshold.
+        let block = setThreshold(21, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "u6");
 
-        // // Owner 2 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(6),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE
-                ],
-                WALLETS[2]
-              ),
-        ]);
+        // Owner 2 confirms.
+        block = confirm(6, THRESHOLD_EXECUTOR, WALLETS[2]);
 
-         // // Owner 3 confirms but tx reverted.
-         block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(6),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE
-                ],
-                WALLETS[3]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u220"); 
+        // Owner 3 confirms but reverted.
+        block = confirm(6, THRESHOLD_EXECUTOR, WALLETS[3]);
+        assertEquals(block.receipts[0].result.expectErr(), "u220");
     },
 });
 
 Clarinet.test({
     name: "Set minimum confirmation - can't be higher than owner count",
     async fn() {
-        let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM")), 
-                    types.some(types.uint(4)),
-                    types.none()
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        // Start a transaction to set threshold.
+        let block = setThreshold(4, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "u7");
 
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(7),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[2]
-              ),
-        ]);
+        // Owner 2 confirms.
+        block = confirm(7, THRESHOLD_EXECUTOR, WALLETS[2]);
 
-         block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(7),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[3]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u230"); 
+        // Owner 3 confirms but reverted.
+        block = confirm(7, THRESHOLD_EXECUTOR, WALLETS[3]);
+        assertEquals(block.receipts[0].result.expectErr(), "u230");
     },
 });
 
 
 Clarinet.test({
-    name: "Remove an owner - owner count cant be lower than minimum confirmation",
+    name: "Remove an owner - owner count cannot be lower than threshold",
     async fn() {
         // Start a new transaction to remove an owner.
-         let block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "submit",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                    types.some(types.principal(WALLETS[3])),
-                    types.none(),
-                    types.none()
-                ],
-                WALLETS[3]
-              ),
-        ]);
+        let block = removeOwner(WALLETS[3], WALLETS[3]);
         assertEquals(block.receipts[0].result.expectOk(), "u8");
 
         // Owner 2 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(8),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[1]
-              ),
-        ]);
+        block = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(block.receipts[0].result.expectOk(), "false");
 
-        // Owner 3 confirms.
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "confirm",
-                [
-                    types.uint(8), 
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner"),
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"),
-                    FT_NONE,
-                    NFT_NONE,
-                ],
-                WALLETS[2]
-              ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u230"); 
+        // Owner 3 confirms but reverted.
+        block = block = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
+        assertEquals(block.receipts[0].result.expectErr(), "u230");
     },
 });
