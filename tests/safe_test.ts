@@ -15,7 +15,7 @@ const REMOVE_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJ
 const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold");
 const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
 
-const submitTx = (executor: any, paramP: string | null, paramU: number | null, txSender: string) => {
+const submit = (executor: any, paramP: string | null, paramU: number | null, txSender: string) => {
     return CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -35,19 +35,19 @@ const submitTx = (executor: any, paramP: string | null, paramU: number | null, t
 }
 
 const addOwner = (newOwner: string, txSender: string) => {
-    return submitTx(ADD_OWNER_EXECUTOR, newOwner, null, txSender);
+    return submit(ADD_OWNER_EXECUTOR, newOwner, null, txSender);
 }
 
 const setThreshold = (threshold: number, txSender: string) => {
-    return submitTx(THRESHOLD_EXECUTOR, null, threshold, txSender);
+    return submit(THRESHOLD_EXECUTOR, null, threshold, txSender);
 }
 
 const removeOwner = (owner: string, txSender: string) => {
-    return submitTx(REMOVE_OWNER_EXECUTOR, owner, null, txSender);
+    return submit(REMOVE_OWNER_EXECUTOR, owner, null, txSender);
 }
 
 const transferStx = (recipient: string, amount: number, txSender: string) => {
-    return submitTx(TRANSFER_STX_EXECUTOR, recipient, amount, txSender);
+    return submit(TRANSFER_STX_EXECUTOR, recipient, amount, txSender);
 }
 
 const confirm = (txId: number, executor: any, txSender: string) => {
