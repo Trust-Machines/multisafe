@@ -458,7 +458,7 @@ Clarinet.test({
             ),
         ]);
 
-        assertEquals(block.receipts[0].result, '"0.0.1.alpha"');
+        assertEquals(block.receipts[0].result, '"0.0.2.alpha"');
     },
 });
 
