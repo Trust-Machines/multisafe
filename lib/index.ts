@@ -17,7 +17,7 @@ export function makeFtNone(network: NETWORK) {
     return `${DEPLOYER[network]}.ft-none`;
 }
 
-export function makeNFtNone(network: NETWORK) {
+export function makeNftNone(network: NETWORK) {
     return `${DEPLOYER[network]}.nft-none`;
 }
 

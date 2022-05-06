@@ -1,5 +1,5 @@
 import fs from "fs";
-import { makeSafeContract, makeFtNone, makeNFtNone } from "./index";
+import { makeSafeContract, makeFtNone, makeNftNone } from "./index";
 
 test("makeSafeContract mainnet", () => {
     const code = fs.readFileSync("contracts/safe.clar", { encoding: "utf-8" });
@@ -46,6 +46,6 @@ test("makeFtNone", () => {
 });
 
 test("makeNFtNone", () => {
-    expect(makeNFtNone("testnet")).toMatchSnapshot();
-    expect(makeNFtNone("mainnet")).toMatchSnapshot();
+    expect(makeNftNone("testnet")).toMatchSnapshot();
+    expect(makeNftNone("mainnet")).toMatchSnapshot();
 });
