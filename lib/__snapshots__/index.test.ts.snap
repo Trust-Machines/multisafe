@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`makeFtNone 1`] = `"ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.ft-none"`;
+exports[`makeFtNone 1`] = `"ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.ft-none"`;
 
-exports[`makeFtNone 2`] = `"SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.ft-none"`;
+exports[`makeFtNone 2`] = `"SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.ft-none"`;
 
-exports[`makeNFtNone 1`] = `"ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.nft-none"`;
+exports[`makeNFtNone 1`] = `"ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.nft-none"`;
 
-exports[`makeNFtNone 2`] = `"SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.nft-none"`;
+exports[`makeNFtNone 2`] = `"SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.nft-none"`;
 
 exports[`makeSafeContract mainnet 1`] = `
 ";; Title: MultiSafe
@@ -21,12 +21,12 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; such as STX transfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
-(use-trait executor-trait 'SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits.executor-trait) 
-(use-trait safe-trait 'SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits.safe-trait)
-(use-trait nft-trait 'SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits.sip-009-trait)
-(use-trait ft-trait 'SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits.sip-010-trait)
+(use-trait executor-trait 'SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.multisafe-traits.executor-trait) 
+(use-trait safe-trait 'SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.multisafe-traits.safe-trait)
+(use-trait nft-trait 'SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.multisafe-traits.sip-009-trait)
+(use-trait ft-trait 'SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.multisafe-traits.sip-010-trait)
 
-(impl-trait 'SP3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBPEKAEK7.multisafe-traits.safe-trait)
+(impl-trait 'SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.multisafe-traits.safe-trait)
 
 ;; Errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
@@ -374,12 +374,12 @@ exports[`makeSafeContract testnet 1`] = `
 ;; such as STX transfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
-(use-trait executor-trait 'ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits.executor-trait) 
-(use-trait safe-trait 'ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits.safe-trait)
-(use-trait nft-trait 'ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits.sip-009-trait)
-(use-trait ft-trait 'ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits.sip-010-trait)
+(use-trait executor-trait 'ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.multisafe-traits.executor-trait) 
+(use-trait safe-trait 'ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.multisafe-traits.safe-trait)
+(use-trait nft-trait 'ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.multisafe-traits.sip-009-trait)
+(use-trait ft-trait 'ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.multisafe-traits.sip-010-trait)
 
-(impl-trait 'ST3XD84X3PE79SHJAZCDW1V5E9EA8JSKRBNNJCANK.multisafe-traits.safe-trait)
+(impl-trait 'ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.multisafe-traits.safe-trait)
 
 ;; Errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
