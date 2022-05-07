@@ -6,7 +6,6 @@
     "removeComments": true
   },
   "include": [
-    "lib/**/*",
-    "deploy/**/*"
+    "lib/**/*"
   ]
 }
