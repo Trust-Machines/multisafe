@@ -21,7 +21,10 @@
     "contracts/executors/transfer-stx.clar"
   ],
   "dependencies": {
+    "@stacks/transactions": "^4.0.0",
+    "@stacks/wallet-sdk": "^4.0.0",
     "@types/jest": "^27.4.1",
+    "dotenv": "^16.0.0",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.3",
     "tslib": "^2.3.1",

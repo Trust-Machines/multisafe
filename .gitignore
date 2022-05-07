@@ -8,3 +8,5 @@ history.txt
 /node_modules
 
 /build
+
+/generated
