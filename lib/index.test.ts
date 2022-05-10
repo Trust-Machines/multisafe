@@ -1,5 +1,5 @@
 import fs from "fs";
-import { makeSafeContract, makeFtNone, makeNftNone } from "./index";
+import { makeSafeContract } from "./index";
 
 test("makeSafeContract mainnet", () => {
     const code = fs.readFileSync("contracts/safe.clar", { encoding: "utf-8" });
@@ -40,12 +40,3 @@ test("Threshold can't be higher than owner count", () => {
     }
 });
 
-test("makeFtNone", () => {
-    expect(makeFtNone("testnet")).toMatchSnapshot();
-    expect(makeFtNone("mainnet")).toMatchSnapshot();
-});
-
-test("makeNFtNone", () => {
-    expect(makeNftNone("testnet")).toMatchSnapshot();
-    expect(makeNftNone("mainnet")).toMatchSnapshot();
-});

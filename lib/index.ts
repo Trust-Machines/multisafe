@@ -13,14 +13,6 @@ const TRAIT_BASE: Record<NETWORK, string> = {
 
 export const MAX_OWNERS = 20;
 
-export function makeFtNone(network: NETWORK) {
-    return `${DEPLOYER[network]}.ft-none`;
-}
-
-export function makeNftNone(network: NETWORK) {
-    return `${DEPLOYER[network]}.nft-none`;
-}
-
 function makeTraits(code: string, network: NETWORK) {
     return code.replace(/ .traits/g, ` '${TRAIT_BASE[network]}`);
 }

@@ -1,13 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`makeFtNone 1`] = `"ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.ft-none"`;
-
-exports[`makeFtNone 2`] = `"SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.ft-none"`;
-
-exports[`makeNFtNone 1`] = `"ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB.nft-none"`;
-
-exports[`makeNFtNone 2`] = `"SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF.nft-none"`;
-
 exports[`makeSafeContract mainnet 1`] = `
 ";; Title: MultiSafe
 ;; Author: Talha Bugra Bulut & Trust Machines
