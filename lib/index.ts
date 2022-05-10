@@ -6,6 +6,12 @@ export const DEPLOYER: Record<NETWORK, string> = {
     testnet: "ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB"
 }
 
+// A list of all deployer adresses we used. Helps to determine transaction types with the frontend app.
+export const DEPLOYERS = [
+    "SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF",
+    "ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB"
+]
+
 const TRAIT_BASE: Record<NETWORK, string> = {
     mainnet: `${DEPLOYER.mainnet}.multisafe-traits`,
     testnet: `${DEPLOYER.testnet}.multisafe-traits`
