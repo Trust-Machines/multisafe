@@ -37,6 +37,14 @@ depends_on = ["safe"]
 path = "contracts/executors/transfer-sip-009.clar"
 depends_on = ["safe"]
 
+[contracts.enable-magic-bridge]
+path = "contracts/executors/enable-magic-bridge.clar"
+depends_on = ["safe", "magic-bridge"]
+
+[contracts.set-vault-token-per-cycle]
+path = "contracts/executors/set-vault-token-per-cycle.clar"
+depends_on = ["safe", "vault"]
+
 [contracts.ft-none]
 path = "contracts/helper/ft-none.clar"
 depends_on = []
@@ -45,11 +53,10 @@ depends_on = []
 path = "contracts/helper/nft-none.clar"
 depends_on = []
 
+[contracts.magic-bridge]
+path = "contracts/misc/magic-bridge.clar"
+depends_on = []
+
 [contracts.vault]
 path = "contracts/misc/vault.clar"
 depends_on = []
-
-[contracts.set-vault-token-per-cycle]
-path = "contracts/executors/set-vault-token-per-cycle.clar"
-depends_on = ["safe", "vault"]
-
