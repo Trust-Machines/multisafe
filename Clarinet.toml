@@ -37,8 +37,8 @@ depends_on = ["safe"]
 path = "contracts/executors/transfer-sip-009.clar"
 depends_on = ["safe"]
 
-[contracts.enable-magic-bridge]
-path = "contracts/executors/enable-magic-bridge.clar"
+[contracts.magic-bridge-enable]
+path = "contracts/executors/magic-bridge-enable.clar"
 depends_on = ["safe", "magic-bridge"]
 
 [contracts.set-vault-token-per-cycle]

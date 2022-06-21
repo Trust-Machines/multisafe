@@ -79,8 +79,8 @@ const DEPLOY_LIST = [
         file: "executors/transfer-sip-010.clar"
     },
     {
-        name: "enable-magic-bridge",
-        file: "executors/enable-magic-bridge.clar"
+        name: "magic-bridge-enable",
+        file: "executors/magic-bridge-enable.clar"
     }
 ];
 
