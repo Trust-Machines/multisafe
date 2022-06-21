@@ -81,6 +81,10 @@ const DEPLOY_LIST = [
     {
         name: "magic-bridge-enable",
         file: "executors/magic-bridge-enable.clar"
+    },
+    {
+        name: "magic-bridge-send",
+        file: "executors/magic-bridge-send.clar"
     }
 ];
 
