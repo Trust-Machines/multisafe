@@ -1,5 +1,5 @@
-import { Clarinet, Tx, Chain, Account, types, green } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
-import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
+import { Clarinet, Tx, Chain, Account, types, green } from 'https://deno.land/x/clarinet@v0.31.0/index.ts';
+import { assertEquals } from 'https://deno.land/std@0.125.0/testing/asserts.ts';
 
 const FT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none");
 const NFT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none");
