@@ -132,10 +132,10 @@ const getTransaction = (CHAIN: Chain, txId: number, txSender: string) => {
 type TestFn = (
     CHAIN: Chain,
     WALLETS: string[],
-    DEPLOYER: string,
+    DEPLOYER?: string,
 ) => void
 
-const testSetup: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSetup: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // send some stx to the safe contract
     CHAIN.mineBlock([
         Tx.transferSTX(
@@ -149,7 +149,7 @@ const testSetup: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) =>
     assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 50000000);
 }
 
-const testSafeOnly: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSafeOnly: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     let block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -181,7 +181,7 @@ const testSafeOnly: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string)
     assertEquals(block.receipts[0].result.expectErr(), "u100");
 }
 
-const testOnlyOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testOnlyOwner: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     let resp = addOwner(CHAIN, "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
     assertEquals(resp.expectErr(), "u130");
 
@@ -189,7 +189,7 @@ const testOnlyOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string
     assertEquals(resp.expectErr(), "u130");
 }
 
-const testAddNewOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testAddNewOwner: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Check current owners. Should be 3.
     let owners = getOwners(CHAIN, WALLETS[0]);
     assertEquals(owners.length, 3);
@@ -245,7 +245,7 @@ const testAddNewOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: stri
     assertEquals(nonce, "u1");
 }
 
-const testSetThreshold: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSetThreshold: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Check current value. should be 2.
     let threshold = getThreshold(CHAIN, WALLETS[0]);
     assertEquals(threshold, "u2");
@@ -263,7 +263,7 @@ const testSetThreshold: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: str
     assertEquals(threshold, "u3");
 }
 
-const testRemoveOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testRemoveOwner: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Start a new transaction to remove an owner.
     let resp = removeOwner(CHAIN, WALLETS[0], WALLETS[3]);
     assertEquals(resp.expectOk(), "u2");
@@ -291,7 +291,7 @@ const testRemoveOwner: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: stri
     assertEquals(owners.length, 3);
 }
 
-const testSpendStx: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSpendStx: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Start a new transaction to send STX from the safe to another account
     let resp = transferStx(CHAIN, "STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
     assertEquals(resp.expectOk(), "u3");
@@ -309,7 +309,7 @@ const testSpendStx: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string)
     assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 0);
 }
 
-const testVaultOwnershipExample: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testVaultOwnershipExample: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER?: string) => {
     // We have an imaginary vault contract and owner of the contract is the safe contract
     // We want to update `token-per-cycle` by calling an owner only function `set-token-per-cycle`
 
@@ -319,7 +319,7 @@ const testVaultOwnershipExample: TestFn = (CHAIN: Chain, WALLETS: string[], DEPL
             "vault",
             "get-token-per-cycle",
             [],
-            DEPLOYER
+            DEPLOYER!
         ),
     ]);
     assertEquals(block.receipts[0].result, "u100");
@@ -330,7 +330,7 @@ const testVaultOwnershipExample: TestFn = (CHAIN: Chain, WALLETS: string[], DEPL
             "vault",
             "set-token-per-cycle",
             [types.uint(500)],
-            DEPLOYER
+            DEPLOYER!
         ),
     ]);
     assertEquals(block.receipts[0].result.expectErr(), "u900");
@@ -394,13 +394,13 @@ const testVaultOwnershipExample: TestFn = (CHAIN: Chain, WALLETS: string[], DEPL
             "vault",
             "get-token-per-cycle",
             [],
-            DEPLOYER
+            DEPLOYER!
         ),
     ]);
     assertEquals(block.receipts[0].result, "u1200");
 }
 
-const testListTransactionsByIds: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testListTransactionsByIds: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     let block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -413,7 +413,7 @@ const testListTransactionsByIds: TestFn = (CHAIN: Chain, WALLETS: string[], DEPL
     assertEquals(block.receipts[0].result.expectList().length, 5);
 }
 
-const testGetVersion: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testGetVersion: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     let block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -426,7 +426,7 @@ const testGetVersion: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: strin
     assertEquals(block.receipts[0].result, '"0.0.2.alpha"');
 }
 
-const testGetInfo: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testGetInfo: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     let block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -443,7 +443,7 @@ const testGetInfo: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) 
     assertEquals(json.nonce !== undefined, true);
 }
 
-const testRevoke: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testRevoke: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Tx not exists.
     let resp = revoke(CHAIN, 10, WALLETS[2]);
     assertEquals(resp.expectErr(), 'u140');
@@ -469,7 +469,7 @@ const testRevoke: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) =
     assertEquals(JSON.parse(JSON.stringify(tx)).confirmations, '[]');
 }
 
-const testSetThresholdOverflowProtection: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSetThresholdOverflowProtection: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Start a transaction to set threshold.
     let resp = setThreshold(CHAIN, 21, WALLETS[1]);
     assertEquals(resp.expectOk(), "u6");
@@ -482,7 +482,7 @@ const testSetThresholdOverflowProtection: TestFn = (CHAIN: Chain, WALLETS: strin
     assertEquals(resp.expectErr(), "u220");
 }
 
-const testSetThresholdOwnerCountProtection: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testSetThresholdOwnerCountProtection: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Start a transaction to set threshold.
     let resp = setThreshold(CHAIN, 4, WALLETS[1]);
     assertEquals(resp.expectOk(), "u7");
@@ -495,7 +495,7 @@ const testSetThresholdOwnerCountProtection: TestFn = (CHAIN: Chain, WALLETS: str
     assertEquals(resp.expectErr(), "u230");
 }
 
-const testRemoveOwnerThresholdProtection: TestFn = (CHAIN: Chain, WALLETS: string[], DEPLOYER: string) => {
+const testRemoveOwnerThresholdProtection: TestFn = (CHAIN: Chain, WALLETS: string[]) => {
     // Start a new transaction to remove an owner.
     let resp = removeOwner(CHAIN, WALLETS[3], WALLETS[3]);
     assertEquals(resp.expectOk(), "u8");
@@ -515,20 +515,20 @@ Clarinet.test({
         const WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x + 1}`)!.address);
         const DEPLOYER = accounts.get('deployer')!.address
 
-        testSetup(chain, WALLETS, DEPLOYER);
-        testSafeOnly(chain, WALLETS, DEPLOYER);
-        testOnlyOwner(chain, WALLETS, DEPLOYER);
-        testAddNewOwner(chain, WALLETS, DEPLOYER);
-        testSetThreshold(chain, WALLETS, DEPLOYER);
-        testRemoveOwner(chain, WALLETS, DEPLOYER);
-        testSpendStx(chain, WALLETS, DEPLOYER);
+        testSetup(chain, WALLETS);
+        testSafeOnly(chain, WALLETS);
+        testOnlyOwner(chain, WALLETS);
+        testAddNewOwner(chain, WALLETS);
+        testSetThreshold(chain, WALLETS);
+        testRemoveOwner(chain, WALLETS);
+        testSpendStx(chain, WALLETS);
         testVaultOwnershipExample(chain, WALLETS, DEPLOYER);
-        testListTransactionsByIds(chain, WALLETS, DEPLOYER);
-        testGetVersion(chain, WALLETS, DEPLOYER);
-        testGetInfo(chain, WALLETS, DEPLOYER);
-        testRevoke(chain, WALLETS, DEPLOYER);
-        testSetThresholdOverflowProtection(chain, WALLETS, DEPLOYER);
-        testSetThresholdOwnerCountProtection(chain, WALLETS, DEPLOYER);
-        testRemoveOwnerThresholdProtection(chain, WALLETS, DEPLOYER);
+        testListTransactionsByIds(chain, WALLETS);
+        testGetVersion(chain, WALLETS);
+        testGetInfo(chain, WALLETS);
+        testRevoke(chain, WALLETS);
+        testSetThresholdOverflowProtection(chain, WALLETS);
+        testSetThresholdOwnerCountProtection(chain, WALLETS);
+        testRemoveOwnerThresholdProtection(chain, WALLETS);
     },
 });
