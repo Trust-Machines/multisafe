@@ -35,7 +35,7 @@ MultiSafe is written in Clarity and therefore requires you to install Clarinet l
 $ clarinet --version
 ```
 
-Please make sure you have Clarinet version 0.31 or higher installed.
+Please make sure you have Clarinet version 0.31.1 or higher installed.
 
 ### Download MultiSafe  
 
