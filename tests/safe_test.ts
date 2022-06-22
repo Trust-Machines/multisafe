@@ -1,10 +1,5 @@
-import { Clarinet, Tx, Chain, Account, types } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
-import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
-
-
-let CHAIN: Chain;
-let WALLETS: string[] = [];
-let DEPLOYER: string = "";
+import { Clarinet, Tx, Chain, Account, types, green } from 'https://deno.land/x/clarinet@v0.31.0/index.ts';
+import { assertEquals } from 'https://deno.land/std@0.125.0/testing/asserts.ts';
 
 const FT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ft-none");
 const NFT_NONE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.nft-none");
@@ -15,7 +10,9 @@ const REMOVE_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJ
 const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold");
 const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
 
-const submit = (executor: any, paramP: string | null, paramU: number | null, txSender: string) => {
+/* Test helpers */
+
+const submit = (CHAIN: Chain, executor: any, paramP: string | null, paramU: number | null, txSender: string) => {
     return CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -34,23 +31,23 @@ const submit = (executor: any, paramP: string | null, paramU: number | null, txS
     ]).receipts[0].result;
 }
 
-const addOwner = (newOwner: string, txSender: string) => {
-    return submit(ADD_OWNER_EXECUTOR, newOwner, null, txSender);
+const addOwner = (CHAIN: Chain, newOwner: string, txSender: string) => {
+    return submit(CHAIN, ADD_OWNER_EXECUTOR, newOwner, null, txSender);
 }
 
-const setThreshold = (threshold: number, txSender: string) => {
-    return submit(THRESHOLD_EXECUTOR, null, threshold, txSender);
+const setThreshold = (CHAIN: Chain, threshold: number, txSender: string) => {
+    return submit(CHAIN, THRESHOLD_EXECUTOR, null, threshold, txSender);
 }
 
-const removeOwner = (owner: string, txSender: string) => {
-    return submit(REMOVE_OWNER_EXECUTOR, owner, null, txSender);
+const removeOwner = (CHAIN: Chain, owner: string, txSender: string) => {
+    return submit(CHAIN, REMOVE_OWNER_EXECUTOR, owner, null, txSender);
 }
 
-const transferStx = (recipient: string, amount: number, txSender: string) => {
-    return submit(TRANSFER_STX_EXECUTOR, recipient, amount, txSender);
+const transferStx = (CHAIN: Chain, recipient: string, amount: number, txSender: string) => {
+    return submit(CHAIN, TRANSFER_STX_EXECUTOR, recipient, amount, txSender);
 }
 
-const confirm = (txId: number, executor: any, txSender: string) => {
+const confirm = (CHAIN: Chain, txId: number, executor: any, txSender: string) => {
     return CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -67,7 +64,7 @@ const confirm = (txId: number, executor: any, txSender: string) => {
     ]).receipts[0].result;
 }
 
-const revoke = (txId: number, txSender: string) => {
+const revoke = (CHAIN: Chain, txId: number, txSender: string) => {
     return CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
@@ -78,64 +75,68 @@ const revoke = (txId: number, txSender: string) => {
     ]).receipts[0].result;
 }
 
-const getOwners = () => {
+const getOwners = (CHAIN: Chain, txSender: string) => {
     let block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
             "get-owners",
             [],
-            WALLETS[0]
+            txSender
         ),
     ]);
 
     return block.receipts[0].result.expectList();
 }
 
-const getNonce = () => {
+const getNonce = (CHAIN: Chain, txSender: string) => {
     const block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
             "get-nonce",
             [],
-            WALLETS[0]
+            txSender
         ),
     ]);
 
     return block.receipts[0].result;
 }
 
-const getThreshold = () => {
+const getThreshold = (CHAIN: Chain, txSender: string) => {
     const block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
             "get-threshold",
             [],
-            WALLETS[0]
+            txSender
         ),
     ]);
     return block.receipts[0].result;
 }
 
-const getTransaction = (txId: number) => {
+const getTransaction = (CHAIN: Chain, txId: number, txSender: string) => {
     const block = CHAIN.mineBlock([
         Tx.contractCall(
             "safe",
             "get-transaction",
             [types.uint(txId)],
-            WALLETS[0]
+            txSender
         ),
     ]);
 
     return block.receipts[0].result.expectTuple()
 }
 
-Clarinet.test({
-    name: "Setup",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        CHAIN = chain;
-        WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x + 1}`)!.address);
-        DEPLOYER = accounts.get('deployer')!.address
 
+/* Test definitions */
+
+type TestFn = (
+    CHAIN: Chain,
+    WALLETS: string[],
+    DEPLOYER?: string,
+) => void
+
+const TESTS: Record<string, TestFn> = {
+    "testSetup": (CHAIN: Chain, WALLETS: string[]) => {
         // send some stx to the safe contract
         CHAIN.mineBlock([
             Tx.transferSTX(
@@ -148,12 +149,7 @@ Clarinet.test({
         const assetMap = CHAIN.getAssetsMaps();
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 50000000);
     },
-});
-
-
-Clarinet.test({
-    name: "Safe only checks",
-    async fn() {
+    "testSafeOnly": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -184,37 +180,27 @@ Clarinet.test({
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u100");
     },
-});
-
-
-Clarinet.test({
-    name: "Onwer only checks",
-    async fn() {
-        let resp = addOwner("ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
+    "testOnlyOwner": (CHAIN: Chain, WALLETS: string[]) => {
+        let resp = addOwner(CHAIN, "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
         assertEquals(resp.expectErr(), "u130");
 
-        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[3]);
+        resp = confirm(CHAIN, 0, ADD_OWNER_EXECUTOR, WALLETS[3]);
         assertEquals(resp.expectErr(), "u130");
     },
-});
-
-
-Clarinet.test({
-    name: "Add a new owner",
-    async fn() {
+    "testAddNewOwner": (CHAIN: Chain, WALLETS: string[]) => {
         // Check current owners. Should be 3.
-        let owners = getOwners();
+        let owners = getOwners(CHAIN, WALLETS[0]);
         assertEquals(owners.length, 3);
         assertEquals(owners[0], WALLETS[0]);
         assertEquals(owners[1], WALLETS[1]);
         assertEquals(owners[2], WALLETS[2]);
 
         // Start a new transaction to add a new owner.
-        let resp = addOwner(WALLETS[3], WALLETS[0]);
+        let resp = addOwner(CHAIN, WALLETS[3], WALLETS[0]);
         assertEquals(resp.expectOk(), "u0");
 
         // The new transaction should be available in the transacions mapping.
-        let tx: any = getTransaction(0);
+        let tx: any = getTransaction(CHAIN, 0, WALLETS[0]);
         let confirmations = tx.confirmations.expectList()
 
         assertEquals(tx.id, "u0");
@@ -223,23 +209,23 @@ Clarinet.test({
         assertEquals(confirmations[0], WALLETS[0]);
 
         // The user already confirmed transaction by submitting it. Should revert.
-        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[0]);
+        resp = confirm(CHAIN, 0, ADD_OWNER_EXECUTOR, WALLETS[0]);
         assertEquals(resp.expectErr(), "u150");
 
         // Executor should be passed properly. Should revert.
-        resp = confirm(0, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        resp = confirm(CHAIN, 0, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectErr(), "u160");
 
         // Owner 2 confirms.
-        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[1]);
+        resp = confirm(CHAIN, 0, ADD_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "true");
 
         // The transaction already confirmed. Should revert
-        resp = confirm(0, ADD_OWNER_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 0, ADD_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectErr(), "u180");
 
         // The transaction confirmed by sufficient number of owners.
-        tx = getTransaction(0);
+        tx = getTransaction(CHAIN, 0, WALLETS[0]);
         confirmations = tx.confirmations.expectList();
 
         assertEquals(tx.confirmed, "true");
@@ -248,56 +234,46 @@ Clarinet.test({
         assertEquals(confirmations[1], WALLETS[1]);
 
         // New owner should be added. should be 4.
-        owners = getOwners();
+        owners = getOwners(CHAIN, WALLETS[0]);
         assertEquals(owners.length, 4);
         assertEquals(owners[3], WALLETS[3]);
 
         // Nonce should be incremented.
-        const nonce = getNonce();
+        const nonce = getNonce(CHAIN, WALLETS[0]);
         assertEquals(nonce, "u1");
     },
-});
-
-
-Clarinet.test({
-    name: "Set confirmation threshold",
-    async fn() {
+    "testSetThreshold": (CHAIN: Chain, WALLETS: string[]) => {
         // Check current value. should be 2.
-        let threshold = getThreshold();
+        let threshold = getThreshold(CHAIN, WALLETS[0]);
         assertEquals(threshold, "u2");
 
         // Start a transaction to update minimum confirmation requirement.
-        let resp = setThreshold(3, WALLETS[0]);
+        let resp = setThreshold(CHAIN, 3, WALLETS[0]);
         assertEquals(resp.expectOk(), "u1");
 
         // // Owner 2 confirms. Confirmed.
-        resp = confirm(1, THRESHOLD_EXECUTOR, WALLETS[1]);
+        resp = confirm(CHAIN, 1, THRESHOLD_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "true");
 
         // Minimum confirmation requirement should be updated as 3.
-        threshold = getThreshold();
+        threshold = getThreshold(CHAIN, WALLETS[0]);
         assertEquals(threshold, "u3");
     },
-});
-
-
-Clarinet.test({
-    name: "Remove an owner",
-    async fn() {
+    "testRemoveOwner": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a new transaction to remove an owner.
-        let resp = removeOwner(WALLETS[0], WALLETS[3]);
+        let resp = removeOwner(CHAIN, WALLETS[0], WALLETS[3]);
         assertEquals(resp.expectOk(), "u2");
 
         // Owner 2 confirms.
-        resp = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        resp = confirm(CHAIN, 2, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms.
-        resp = confirm(2, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 2, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectOk(), "true");
 
         // Confirmed.
-        let tx: any = getTransaction(2);
+        let tx: any = getTransaction(CHAIN, 2, WALLETS[0]);
         let confirmations = tx.confirmations.expectList()
 
         assertEquals(tx.confirmed, "true");
@@ -307,38 +283,27 @@ Clarinet.test({
         assertEquals(confirmations[2], WALLETS[2]);
 
         // Owner should be removed. Now we should have 3 owners.
-        let owners = getOwners();
+        let owners = getOwners(CHAIN, WALLETS[0]);
         assertEquals(owners.length, 3);
     },
-});
-
-
-Clarinet.test({
-    name: "Spend STX",
-    async fn() {
+    "testSpendStx": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a new transaction to send STX from the safe to another account
-        let resp = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
+        let resp = transferStx(CHAIN, "STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
         assertEquals(resp.expectOk(), "u3");
 
         // Owner 2 confirms.
-        resp = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 3, TRANSFER_STX_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms.
-        resp = confirm(3, TRANSFER_STX_EXECUTOR, WALLETS[3]);
+        resp = confirm(CHAIN, 3, TRANSFER_STX_EXECUTOR, WALLETS[3]);
         assertEquals(resp.expectOk(), "true");
 
         // Confirmed. STX balance of the safe should be 0.
         const assetMap = CHAIN.getAssetsMaps();
         assertEquals(assetMap["assets"]["STX"]["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe"], 0);
     },
-});
-
-
-Clarinet.test({
-    name: "A vault ownership exmaple",
-    async fn() {
-
+    "testVaultOwnershipExample": (CHAIN: Chain, WALLETS: string[], DEPLOYER?: string) => {
         // We have an imaginary vault contract and owner of the contract is the safe contract
         // We want to update `token-per-cycle` by calling an owner only function `set-token-per-cycle`
 
@@ -348,7 +313,7 @@ Clarinet.test({
                 "vault",
                 "get-token-per-cycle",
                 [],
-                DEPLOYER
+                DEPLOYER!
             ),
         ]);
         assertEquals(block.receipts[0].result, "u100");
@@ -359,7 +324,7 @@ Clarinet.test({
                 "vault",
                 "set-token-per-cycle",
                 [types.uint(500)],
-                DEPLOYER
+                DEPLOYER!
             ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u900");
@@ -423,16 +388,12 @@ Clarinet.test({
                 "vault",
                 "get-token-per-cycle",
                 [],
-                DEPLOYER
+                DEPLOYER!
             ),
         ]);
         assertEquals(block.receipts[0].result, "u1200");
     },
-});
-
-Clarinet.test({
-    name: "List transactions by ids",
-    async fn() {
+    "testListTransactionsByIds": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -444,11 +405,7 @@ Clarinet.test({
 
         assertEquals(block.receipts[0].result.expectList().length, 5);
     },
-});
-
-Clarinet.test({
-    name: "Get version",
-    async fn() {
+    "testGetVersion": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -460,11 +417,7 @@ Clarinet.test({
 
         assertEquals(block.receipts[0].result, '"0.0.2.alpha"');
     },
-});
-
-Clarinet.test({
-    name: "Get info",
-    async fn() {
+    "testGetInfo": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -480,85 +433,81 @@ Clarinet.test({
         assertEquals(json["threshold"] !== undefined, true);
         assertEquals(json.nonce !== undefined, true);
     },
-});
-
-Clarinet.test({
-    name: "Revoke",
-    async fn() {
-
+    "testRevoke": (CHAIN: Chain, WALLETS: string[]) => {
         // Tx not exists.
-        let resp = revoke(10, WALLETS[2]);
+        let resp = revoke(CHAIN, 10, WALLETS[2]);
         assertEquals(resp.expectErr(), 'u140');
 
         // Tx already confirmed.
-        resp = revoke(4, WALLETS[2]);
+        resp = revoke(CHAIN, 4, WALLETS[2]);
         assertEquals(resp.expectErr(), 'u180');
 
         // Start a new tx.
-        resp = transferStx("STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
+        resp = transferStx(CHAIN, "STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6", 50000000, WALLETS[1]);
         assertEquals(resp.expectOk(), "u5");
 
         // Should reject becuase the owner hasn't confirmed the tx.
-        resp = revoke(5, WALLETS[2]);
+        resp = revoke(CHAIN, 5, WALLETS[2]);
         assertEquals(resp.expectErr(), 'u190');
 
         // Should revoke.
-        resp = revoke(5, WALLETS[1]);
+        resp = revoke(CHAIN, 5, WALLETS[1]);
         assertEquals(resp.expectOk(), 'true');
 
         // Confirmation should be removed.
-        const tx = getTransaction(5);
+        const tx = getTransaction(CHAIN, 5, WALLETS[0]);
         assertEquals(JSON.parse(JSON.stringify(tx)).confirmations, '[]');
     },
-});
-
-
-Clarinet.test({
-    name: "Set minimum confirmation - overflow protection test",
-    async fn() {
+    "testSetThresholdOverflowProtection": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a transaction to set threshold.
-        let resp = setThreshold(21, WALLETS[1]);
+        let resp = setThreshold(CHAIN, 21, WALLETS[1]);
         assertEquals(resp.expectOk(), "u6");
 
         // Owner 2 confirms.
-        resp = confirm(6, THRESHOLD_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 6, THRESHOLD_EXECUTOR, WALLETS[2]);
 
         // Owner 3 confirms but reverted.
-        resp = confirm(6, THRESHOLD_EXECUTOR, WALLETS[3]);
+        resp = confirm(CHAIN, 6, THRESHOLD_EXECUTOR, WALLETS[3]);
         assertEquals(resp.expectErr(), "u220");
     },
-});
-
-Clarinet.test({
-    name: "Set minimum confirmation - can't be higher than owner count",
-    async fn() {
+    "testSetThresholdOwnerCountProtection": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a transaction to set threshold.
-        let resp = setThreshold(4, WALLETS[1]);
+        let resp = setThreshold(CHAIN, 4, WALLETS[1]);
         assertEquals(resp.expectOk(), "u7");
 
         // Owner 2 confirms.
-        resp = confirm(7, THRESHOLD_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 7, THRESHOLD_EXECUTOR, WALLETS[2]);
 
         // Owner 3 confirms but reverted.
-        resp = confirm(7, THRESHOLD_EXECUTOR, WALLETS[3]);
+        resp = confirm(CHAIN, 7, THRESHOLD_EXECUTOR, WALLETS[3]);
         assertEquals(resp.expectErr(), "u230");
     },
-});
-
-
-Clarinet.test({
-    name: "Remove an owner - owner count cannot be lower than threshold",
-    async fn() {
+    "testRemoveOwnerThresholdProtection": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a new transaction to remove an owner.
-        let resp = removeOwner(WALLETS[3], WALLETS[3]);
+        let resp = removeOwner(CHAIN, WALLETS[3], WALLETS[3]);
         assertEquals(resp.expectOk(), "u8");
 
         // Owner 2 confirms.
-        resp = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
+        resp = confirm(CHAIN, 8, REMOVE_OWNER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "false");
 
         // Owner 3 confirms but reverted.
-        resp = confirm(8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
+        resp = confirm(CHAIN, 8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectErr(), "u230");
+    }
+}
+
+
+
+Clarinet.test({
+    name: "MultiSafe Tests",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+        const WALLETS = [...Array(9).keys()].map(x => accounts.get(`wallet_${x + 1}`)!.address);
+        const DEPLOYER = accounts.get('deployer')!.address;
+
+        for (let t of Object.keys(TESTS)) {
+            TESTS[t](chain, WALLETS, DEPLOYER);
+            console.log(`${t} ${green('ok')}`);
+        }
     },
 });
