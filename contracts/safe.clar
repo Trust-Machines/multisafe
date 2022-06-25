@@ -14,6 +14,7 @@
 (use-trait safe-trait .traits.safe-trait)
 (use-trait nft-trait .traits.sip-009-trait)
 (use-trait ft-trait .traits.sip-010-trait)
+(use-trait magic-bridge-trait .traits.magic-bridge-trait)
 
 (impl-trait .traits.safe-trait)
 
@@ -331,6 +332,84 @@
     )
 )
 
+;; --- Magic Bridge integration
+
+;; Registers the safe as a swapper to Magic Bridge.
+;; @restricted to owners
+;; @params bridge ; contract address of Magic Bridge
+;; @returns (response bool)
+(define-public (mb-initialize-swapper (bridge <magic-bridge-trait>))
+    (begin
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
+        (try! (as-contract (contract-call? bridge initialize-swapper)))
+        (ok true)
+    )
+)
+
+;; Escrow funds for a supplier after sending BTC during an inbound swap.
+;; @params bridge ; contract address of Magic Bridge
+;; @param block; a tuple containing `header` (the Bitcoin block header) and the `height` (Stacks height)
+;; where the BTC tx was confirmed.
+;; @param prev-blocks; because Clarity contracts can't get Bitcoin headers when there is no Stacks block,
+;; this param allows users to specify the chain of block headers going back to the block where the
+;; BTC tx was confirmed.
+;; @param tx; the hex data of the BTC tx
+;; @param proof; a merkle proof to validate inclusion of this tx in the BTC block
+;; @param output-index; the index of the HTLC output in the BTC tx
+;; @param sender; The swapper's public key used in the HTLC
+;; @param recipient; The supplier's public key used in the HTLC
+;; @param expiration-buff; A 4-byte integer the indicated the expiration of the HTLC
+;; @param hash; a hash of the `preimage` used in this swap
+;; @param swapper-buff; a 4-byte integer that indicates the `swapper-id`
+;; @param supplier-id; the supplier used in this swap
+;; @param min-to-receive; minimum receivable calculated off-chain to avoid the supplier front-run the swap by adjusting fees
+;; @returns (response bool)
+(define-public (mb-escrow-swap 
+    (bridge <magic-bridge-trait>)
+    (block { header: (buff 80), height: uint })
+    (prev-blocks (list 10 (buff 80)))
+    (tx (buff 1024))
+    (proof { tx-index: uint, hashes: (list 12 (buff 32)), tree-depth: uint })
+    (output-index uint)
+    (sender (buff 33))
+    (recipient (buff 33))
+    (expiration-buff (buff 4))
+    (hash (buff 32))
+    (swapper-buff (buff 4))
+    (supplier-id uint)
+    (min-to-receive uint)
+  )
+    (begin
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
+        (try! (as-contract (contract-call? bridge escrow-swap block prev-blocks tx proof output-index sender recipient expiration-buff hash swapper-buff supplier-id min-to-receive)))
+        (ok true)
+    )
+)
+
+;; Finalize an inbound swap by revealing the preimage.
+;; @params bridge ; contract address of Magic Bridge
+;; @param txid; the txid of the BTC tx used for this inbound swap
+;; @param preimage; the preimage that hashes to the swap's `hash`
+;; @returns (response bool)
+(define-public (mb-finalize-swap (bridge <magic-bridge-trait>) (txid (buff 32)) (preimage (buff 128)))
+    (begin
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
+        (try! (as-contract (contract-call? bridge finalize-swap txid preimage)))
+        (ok true)
+    )
+)
+
+;; Revoke an expired inbound swap.
+;; @params bridge ; contract address of Magic Bridge
+;; @param txid; the txid of the BTC tx used for this inbound swap
+;; @returns (response bool)
+(define-public (mb-revoke-expired-inbound (bridge <magic-bridge-trait>) (txid (buff 32)))
+    (begin
+        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
+        (try! (as-contract (contract-call? bridge revoke-expired-inbound txid)))
+        (ok true)
+    )
+)
 
 ;; Safe initializer
 ;; @params o ; owners list
