@@ -45,6 +45,10 @@ depends_on = []
 path = "contracts/helper/nft-none.clar"
 depends_on = []
 
+[contracts.magic-bridge]
+path = "contracts/misc/magic-bridge.clar"
+depends_on = []
+
 [contracts.vault]
 path = "contracts/misc/vault.clar"
 depends_on = []

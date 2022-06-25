@@ -494,6 +494,71 @@ const TESTS: Record<string, TestFn> = {
         // Owner 3 confirms but reverted.
         resp = confirm(CHAIN, 8, REMOVE_OWNER_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectErr(), "u230");
+    },
+    "testMagicBridgeFnTests": (CHAIN: Chain, WALLETS: string[]) => {
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-initialize-swapper",
+                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge")],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-escrow-swap",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
+                    types.tuple({header: types.buff("0x21133213"), height: types.uint(1)}),
+                    types.list([]),
+                    types.buff("0x21133213"),
+                    types.tuple({ "tx-index": types.uint(1), hashes: types.list([]), "tree-depth": types.uint(1) }),
+                    types.uint(1),
+                    types.buff("0x21133213"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.uint(1),
+                    types.uint(1)
+
+                ],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-finalize-swap",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21133213"),
+
+                ],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-revoke-expired-inbound",
+                [
+                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
+                    types.buff("0x21133213"),
+
+                ],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
     }
 }
 

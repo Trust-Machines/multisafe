@@ -30,7 +30,7 @@
 
 (define-trait magic-bridge-trait
   (
-    (initialize-swapper () (response bool uint))
+    (initialize-swapper () (response uint uint))
 
 	(escrow-swap ( 
 		{ header: (buff 80), height: uint } ;; block
