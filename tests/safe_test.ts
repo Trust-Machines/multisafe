@@ -415,7 +415,7 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
 
-        assertEquals(block.receipts[0].result, '"0.0.2.alpha"');
+        assertEquals(block.receipts[0].result, '"0.0.3.alpha"');
     },
     "testGetInfo": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
