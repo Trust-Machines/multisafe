@@ -14,6 +14,11 @@ export const DEPLOYERS = [
     "ST1ZBNH98QQ48ZDKHYPS27CB80WG3Y67QHFQKC90B"
 ]
 
+export const MAGIC_BRIDGE: Record<NETWORK, string> = {
+    mainnet: "",
+    testnet: "ST2YG2RWHD3H38304MW0K06BQ2SEEWP38EFXY5CRV.bridge"
+}
+
 const TRAIT_BASE: Record<NETWORK, string> = {
     mainnet: `${DEPLOYER.mainnet}.multisafe-traits`,
     testnet: `${DEPLOYER.testnet}.multisafe-traits`
