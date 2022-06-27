@@ -24,7 +24,7 @@
     (begin 
         (asserts! (is-eq true true) (err u100))
         (ok {
-     	sender: 0x21133213,
+     	sender-public-key: 0x21133213,
 		output-index: u1,
 		csv: u2,
 		redeem-script: 0x21133213,

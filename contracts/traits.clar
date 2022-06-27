@@ -45,8 +45,8 @@
 		(buff 4) ;; swapper-buff
 		uint ;; supplier-id
 		uint ;; min-to-receive
-	) (response  {
-     	sender: (buff 33),
+	) (response {
+     	sender-public-key: (buff 33),
 		output-index: uint,
 		csv: uint,
 		redeem-script: (buff 120),
