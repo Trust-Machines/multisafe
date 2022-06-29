@@ -77,6 +77,10 @@ const DEPLOY_LIST = [
     {
         name: "transfer-sip-010",
         file: "executors/transfer-sip-010.clar"
+    },
+    {
+        name: "magic-bridge-send",
+        file: "executors/magic-bridge-send.clar"
     }
 ];
 
@@ -90,6 +94,12 @@ const main = async () => {
     const TRAIT_SEARCH = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits';
     const TRAIT_REPLACE = `${address}.multisafe-traits`;
 
+    const MAGIC_BRIDGE_SEARCH = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge';
+    let MAGIC_BRIDGE_REPLACE = 'ST2YG2RWHD3H38304MW0K06BQ2SEEWP38EFXY5CRV.bridge';
+    if(NETWORK === 'mainnet'){
+        throw new Error('Magic bridge hasn`t deployed on mainnet yet');
+    }
+
 
     if (fs.existsSync('generated')) {
         fs.rmSync('generated', { recursive: true, force: true });
@@ -101,8 +111,9 @@ const main = async () => {
     let i = 1;
     for (let D of DEPLOY_LIST) {
         const contents = fs.readFileSync(`contracts/${D.file}`, { encoding: 'utf-8' });
-        const code = contents.replace(new RegExp(TRAIT_SEARCH, 'g'), TRAIT_REPLACE);
-        const codeToSave = `${D.name}\n\n${code}`;
+        let codeReplaced = contents.replace(new RegExp(TRAIT_SEARCH, 'g'), TRAIT_REPLACE);
+        codeReplaced = codeReplaced.replace(MAGIC_BRIDGE_SEARCH, MAGIC_BRIDGE_REPLACE);
+        const codeToSave = `${D.name}\n\n${codeReplaced}`;
         fs.writeFileSync(`${savePath}/${i}-${D.name}`, codeToSave, { encoding: 'utf-8' });
         i++;
     }

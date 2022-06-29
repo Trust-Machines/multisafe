@@ -37,6 +37,10 @@ depends_on = ["safe"]
 path = "contracts/executors/transfer-sip-009.clar"
 depends_on = ["safe"]
 
+[contracts.magic-bridge-send]
+path = "contracts/executors/magic-bridge-send.clar"
+depends_on = ["safe"]
+
 [contracts.ft-none]
 path = "contracts/helper/ft-none.clar"
 depends_on = []

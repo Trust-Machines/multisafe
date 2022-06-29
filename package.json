@@ -1,7 +1,7 @@
 {
   "name": "@trustmachines/multisafe-contracts",
   "description": "MultiSafe is a shared crypto wallet for managing Stacks (STX).",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
   "scripts": {
@@ -21,6 +21,7 @@
     "contracts/executors/transfer-sip-009.clar",
     "contracts/executors/transfer-sip-010.clar",
     "contracts/executors/transfer-stx.clar",
+    "contracts/executors/magic-bridge-send.clar",
     "contracts/helper/ft-none.clar",
     "contracts/helper/nft-none.clar"
   ],
