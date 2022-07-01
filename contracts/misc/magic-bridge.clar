@@ -33,32 +33,6 @@
     )
 )
 
-(define-public (finalize-swap (txid (buff 32)) (preimage (buff 128)))
-    (begin 
-        (asserts! (is-eq true true) (err u100))
-        (ok {
-  		    swapper: u1,
-  		    xbtc: u100,
-  		    supplier: u10,
-  		    expiration: u12134,
-  		    hash: 0x21133213,
-	    })
-    )
-)
-
-(define-public (revoke-expired-inbound (txid (buff 32)))
-    (begin 
-        (asserts! (is-eq true true) (err u100))
-        (ok {
-  		    swapper: u1,
-  		    xbtc: u100,
-  		    supplier: u10,
-  		    expiration: u12134,
-  		    hash: 0x21133213,
-	    })
-    )
-)
-
 (define-public (initiate-outbound-swap (xbtc uint) (btc-version (buff 1)) (btc-hash (buff 20)) (supplier-id uint))
     (begin 
         (asserts! (is-eq true true) (err u100))

@@ -42,7 +42,7 @@
 ;; --- Version
 
 ;; Version string
-(define-constant VERSION "0.0.3.alpha")
+(define-constant VERSION "0.0.4.alpha")
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
@@ -382,31 +382,6 @@
     (begin
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge escrow-swap block prev-blocks tx proof output-index sender recipient expiration-buff hash swapper-buff supplier-id min-to-receive)))
-        (ok true)
-    )
-)
-
-;; Finalize an inbound swap by revealing the preimage.
-;; @params bridge ; contract address of Magic Bridge
-;; @param txid; the txid of the BTC tx used for this inbound swap
-;; @param preimage; the preimage that hashes to the swap's `hash`
-;; @returns (response bool)
-(define-public (mb-finalize-swap (bridge <magic-bridge-trait>) (txid (buff 32)) (preimage (buff 128)))
-    (begin
-        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (try! (as-contract (contract-call? bridge finalize-swap txid preimage)))
-        (ok true)
-    )
-)
-
-;; Revoke an expired inbound swap.
-;; @params bridge ; contract address of Magic Bridge
-;; @param txid; the txid of the BTC tx used for this inbound swap
-;; @returns (response bool)
-(define-public (mb-revoke-expired-inbound (bridge <magic-bridge-trait>) (txid (buff 32)))
-    (begin
-        (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
-        (try! (as-contract (contract-call? bridge revoke-expired-inbound txid)))
         (ok true)
     )
 )

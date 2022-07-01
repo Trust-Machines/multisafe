@@ -415,7 +415,7 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
 
-        assertEquals(block.receipts[0].result, '"0.0.3.alpha"');
+        assertEquals(block.receipts[0].result, '"0.0.4.alpha"');
     },
     "testGetInfo": (CHAIN: Chain, WALLETS: string[]) => {
         let block = CHAIN.mineBlock([
@@ -524,35 +524,6 @@ const TESTS: Record<string, TestFn> = {
                     types.buff("0x21"),
                     types.uint(1),
                     types.uint(1)
-
-                ],
-                WALLETS[6]
-            ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");
-
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "mb-finalize-swap",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
-                    types.buff("0x21133213"),
-                    types.buff("0x21133213"),
-
-                ],
-                WALLETS[6]
-            ),
-        ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");
-
-        block = CHAIN.mineBlock([
-            Tx.contractCall(
-                "safe",
-                "mb-revoke-expired-inbound",
-                [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
-                    types.buff("0x21133213"),
 
                 ],
                 WALLETS[6]

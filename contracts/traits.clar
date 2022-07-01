@@ -53,25 +53,6 @@
 		sats: uint
       } uint))
 
-    (finalize-swap (
-		(buff 32) ;; txid
-		(buff 128) ;; preimage
-	) (response {
-  		swapper: uint,
-  		xbtc: uint,
-  		supplier: uint,
-  		expiration: uint,
-  		hash: (buff 32),
-	} uint))
-
-	(revoke-expired-inbound (
-		(buff 32) ;; txid
-	) (response {
-  		swapper: uint,
-  		xbtc: uint,
-  		supplier: uint,
-  		expiration: uint,
-  		hash: (buff 32),
-	} uint))
+    (initiate-outbound-swap ( uint (buff 1) (buff 20) uint ) (response uint uint))
   )
 )
