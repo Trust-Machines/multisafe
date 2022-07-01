@@ -13,13 +13,13 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; such as STX transfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
-(use-trait executor-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.executor-trait) 
-(use-trait safe-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.safe-trait)
-(use-trait nft-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.sip-009-trait)
-(use-trait ft-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.sip-010-trait)
-(use-trait magic-bridge-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.magic-bridge-trait)
+(use-trait executor-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.executor-trait) 
+(use-trait safe-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.safe-trait)
+(use-trait nft-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.sip-009-trait)
+(use-trait ft-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.sip-010-trait)
+(use-trait magic-bridge-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.magic-bridge-trait)
 
-(impl-trait 'SP3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VTQ8VA8H.multisafe-traits.safe-trait)
+(impl-trait 'SP2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVS8NPAQ.multisafe-traits.safe-trait)
 
 ;; Errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
@@ -420,13 +420,13 @@ exports[`makeSafeContract testnet 1`] = `
 ;; such as STX transfer, sip-009-nft transfer, sip-010-trait-ft transfer and much more. Owners list limited to 20 
 ;; members at maximum considering a realistic use case for this kind of multi-owner safe contract.
 
-(use-trait executor-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.executor-trait) 
-(use-trait safe-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.safe-trait)
-(use-trait nft-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.sip-009-trait)
-(use-trait ft-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.sip-010-trait)
-(use-trait magic-bridge-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.magic-bridge-trait)
+(use-trait executor-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.executor-trait) 
+(use-trait safe-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.safe-trait)
+(use-trait nft-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.sip-009-trait)
+(use-trait ft-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.sip-010-trait)
+(use-trait magic-bridge-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.magic-bridge-trait)
 
-(impl-trait 'ST3TM2K3AZASRASP7BHKJ7HSVGTE5WRX1VRX12WND.multisafe-traits.safe-trait)
+(impl-trait 'ST2C8HSADGMCM2G8GZMDG19CRBMQDZMG9YVA8ZQPN.multisafe-traits.safe-trait)
 
 ;; Errors
 (define-constant ERR-CALLER-MUST-BE-SELF (err u100))
