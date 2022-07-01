@@ -1,6 +1,6 @@
 {
   "name": "@trustmachines/multisafe-contracts",
-  "description": "MultiSafe is a shared crypto wallet for managing Stacks (STX).",
+  "description": "MultiSafe is a shared crypto wallet for managing Stacks (STX) and Bitcoin (BTC).",
   "version": "0.3.2",
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
