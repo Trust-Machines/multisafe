@@ -33,18 +33,18 @@
     (initialize-swapper () (response uint uint))
 
 	(escrow-swap ( 
-		{ header: (buff 80), height: uint } ;; block
-		(list 10 (buff 80)) ;; prev-blocks
-		(buff 1024) ;; tx
-		{ tx-index: uint, hashes: (list 12 (buff 32)), tree-depth: uint } ;; proof
-		uint ;; output-index
-		(buff 33) ;; sender
-		(buff 33) ;; recipient
-		(buff 4) ;; expiration-buff
-		(buff 32) ;; hash
-		(buff 4) ;; swapper-buff
-		uint ;; supplier-id
-		uint ;; min-to-receive
+		{ header: (buff 80), height: uint }	;; block
+		(list 10 (buff 80))	;; prev-blocks
+		(buff 1024)	;; tx
+		{ tx-index: uint, hashes: (list 12 (buff 32)), tree-depth: uint }	;; proof
+		uint	;; output-index
+		(buff 33)	;; sender
+		(buff 33)	;; recipient
+		(buff 4)	;; expiration-buff
+		(buff 32)	;; hash
+		(buff 4)	;; swapper-buff
+		uint	;; supplier-id
+		uint	;; min-to-receive
 	) (response {
      	sender-public-key: (buff 33),
 		output-index: uint,
@@ -53,6 +53,11 @@
 		sats: uint
       } uint))
 
-    (initiate-outbound-swap ( uint (buff 1) (buff 20) uint ) (response uint uint))
+    (initiate-outbound-swap (
+		uint	;; xbtc
+		(buff 1)	;; btc-version
+		(buff 20)	;; btc-hash
+		uint	;; supplier-id
+	) (response uint uint))
   )
 )
