@@ -18,7 +18,7 @@ export const DEPLOYERS = [
 
 export const MAGIC_BRIDGE: Record<NETWORK, string> = {
     mainnet: "",
-    testnet: "ST2YG2RWHD3H38304MW0K06BQ2SEEWP38EFXY5CRV.bridge"
+    testnet: "ST2ZTY9KK9H0FA0NVN3K8BGVN6R7GYVFG6BE7TAR1.bridge"
 }
 
 const TRAIT_BASE: Record<NETWORK, string> = {
