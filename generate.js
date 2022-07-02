@@ -95,7 +95,7 @@ const main = async () => {
     const TRAIT_REPLACE = `${address}.multisafe-traits`;
 
     const MAGIC_BRIDGE_SEARCH = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge';
-    let MAGIC_BRIDGE_REPLACE = 'ST2YG2RWHD3H38304MW0K06BQ2SEEWP38EFXY5CRV.bridge';
+    let MAGIC_BRIDGE_REPLACE = 'ST2ZTY9KK9H0FA0NVN3K8BGVN6R7GYVFG6BE7TAR1.bridge';
     if(NETWORK === 'mainnet'){
         throw new Error('Magic bridge hasn`t deployed on mainnet yet');
     }
