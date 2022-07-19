@@ -32,6 +32,7 @@
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
+(define-constant ERR-OWNER-OVERFLOW (err u220))
 (define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
@@ -67,7 +68,12 @@
 ;; @params owner
 ;; @returns bool
 (define-private (add-owner-internal (owner principal))
-    (var-set owners (unwrap-panic (as-max-len? (append (var-get owners) owner) u20)))
+    (let 
+        (
+           (new-owners (unwrap! (as-max-len? (append (var-get owners) owner) u20) ERR-OWNER-OVERFLOW))
+        )
+        (ok (var-set owners new-owners))
+    )
 )
 
 ;; Adds new owner
@@ -78,7 +84,7 @@
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-none (index-of (var-get owners) owner)) ERR-OWNER-ALREADY-EXISTS)
-        (ok (add-owner-internal owner))
+        (add-owner-internal owner)
     )
 )
 
