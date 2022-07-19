@@ -23,6 +23,7 @@
 (define-constant ERR-OWNER-ALREADY-EXISTS (err u110))
 (define-constant ERR-OWNER-NOT-EXISTS (err u120))
 (define-constant ERR-UNAUTHORIZED-SENDER (err u130))
+(define-constant ERR-ONLY-END-USER (err u135))
 (define-constant ERR-TX-NOT-FOUND (err u140))
 (define-constant ERR-TX-ALREADY-CONFIRMED-BY-OWNER (err u150))
 (define-constant ERR-TX-INVALID-EXECUTOR (err u160))
@@ -255,6 +256,7 @@
             (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
             (confirmations (get confirmations tx))
         )
+        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
         (asserts! (is-some (index-of confirmations tx-sender)) ERR-TX-NOT-CONFIRMED-BY-SENDER)
         (var-set rem-confirmation tx-sender)
@@ -281,6 +283,7 @@
 ;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
+        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -324,6 +327,7 @@
 ;; @returns (response uint)
 (define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
+        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
