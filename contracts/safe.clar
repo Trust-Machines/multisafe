@@ -32,7 +32,6 @@
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
 (define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
-(define-constant ERR-THRESHOLD-OVERFLOW (err u220))
 (define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
@@ -135,7 +134,6 @@
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-THRESHOLD-CANT-BE-ZERO)
-        (asserts! (<= value u20) ERR-THRESHOLD-OVERFLOW)
         (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW-OWNERS)
         (ok (set-threshold-internal value))
     )

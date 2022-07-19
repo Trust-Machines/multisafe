@@ -471,7 +471,7 @@ const TESTS: Record<string, TestFn> = {
 
         // Owner 3 confirms but reverted.
         resp = confirm(CHAIN, 6, THRESHOLD_EXECUTOR, WALLETS[3]);
-        assertEquals(resp.expectErr(), "u220");
+        assertEquals(resp.expectErr(), "u230");
     },
     "testSetThresholdOwnerCountProtection": (CHAIN: Chain, WALLETS: string[]) => {
         // Start a transaction to set threshold.
