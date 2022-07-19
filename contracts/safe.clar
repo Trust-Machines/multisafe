@@ -30,7 +30,6 @@
 (define-constant ERR-INVALID-SAFE (err u170))
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
-(define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
 (define-constant ERR-OWNER-OVERFLOW (err u220))
 (define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
@@ -107,7 +106,6 @@
         )
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
-        (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
         (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW-OWNERS)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
@@ -117,7 +115,7 @@
 
 ;; --- Minimum confirmation threshold 
 
-(define-data-var threshold uint u0)
+(define-data-var threshold uint u1)
 
 ;; Returns confirmation threshold
 ;; @returns uint 
