@@ -434,6 +434,7 @@ const TESTS: Record<string, TestFn> = {
         assertEquals(json.owners !== undefined, true);
         assertEquals(json["threshold"] !== undefined, true);
         assertEquals(json.nonce !== undefined, true);
+        assertEquals(json["mb-address"] !== undefined, true);
     },
     "testRevoke": (CHAIN: Chain, WALLETS: string[]) => {
         // Tx not exists.
