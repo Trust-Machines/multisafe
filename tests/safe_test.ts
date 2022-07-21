@@ -204,6 +204,16 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u100");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "set-mb-address",
+                [types.principal(MAGIC_BRIDGE)],
+                WALLETS[2]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u100");
     },
     "testOnlyOwner": (CHAIN: Chain, WALLETS: string[]) => {
         let resp = addOwner(CHAIN, "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND", WALLETS[3]);
