@@ -161,6 +161,46 @@
 )
 
 
+;; --- Access control
+
+;; A map to store allowed contract addresses
+(define-map allowed-callers principal bool)
+
+;; Adds an address to allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (allow-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-set allowed-callers caller true))
+  )
+)
+
+;; Removes an address from allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (revoke-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-delete allowed-callers caller))
+  )
+)
+
+;; Returns true if the caller passed in the allowed-callers map 
+;; or its equal to current tx-sender
+;; @returns bool
+(define-read-only (is-allowed-caller (caller principal))
+  (or
+    (match (map-get? allowed-callers caller)
+      value true
+      false
+    )
+    (is-eq tx-sender caller)
+  )
+)
+
 ;; --- Read all basic safe information at once
 
 (define-read-only (get-info)
@@ -258,7 +298,7 @@
             (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
             (confirmations (get confirmations tx))
         )
-        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
         (asserts! (is-some (index-of confirmations tx-sender)) ERR-TX-NOT-CONFIRMED-BY-SENDER)
         (var-set rem-confirmation tx-sender)
@@ -285,7 +325,7 @@
 ;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
-        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -329,7 +369,7 @@
 ;; @returns (response uint)
 (define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
-        (asserts! (is-eq tx-sender contract-caller) ERR-ONLY-END-USER)
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let

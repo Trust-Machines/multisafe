@@ -8,9 +8,12 @@ const SAFE = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.safe");
 const ADD_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.add-owner");
 const REMOVE_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner");
 const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold");
+const ALLOW_CALLER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.allow-caller");
+const REVOKE_CALLER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.revoke-caller");
 const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
 const MAGIC_BRIDGE_SET_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge-set");
 const MAGIC_BRIDGE = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge";
+const PROXY_CONTRACT = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.proxy";
 
 /* Test helpers */
 
@@ -177,6 +180,26 @@ const TESTS: Record<string, TestFn> = {
                 "safe",
                 "set-threshold",
                 [types.uint(1)],
+                WALLETS[2]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u100");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "allow-caller",
+                [types.principal(PROXY_CONTRACT)],
+                WALLETS[2]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u100");
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "revoke-caller",
+                [types.principal(PROXY_CONTRACT)],
                 WALLETS[2]
             ),
         ]);
@@ -583,10 +606,77 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u130");
+    },
+    "testAccessControl": (CHAIN: Chain, WALLETS: string[]) => {
+        // Should block proxy contract.
+        let block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "proxy",
+                "submit-tx",
+                [],
+                WALLETS[1]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u135");
+
+        // Allow proxy contract
+        let resp =  submit(CHAIN, ALLOW_CALLER_EXECUTOR, PROXY_CONTRACT, null, WALLETS[3]);
+        assertEquals(resp.expectOk(), "u10");
+        resp = confirm(CHAIN, 10, ALLOW_CALLER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "false");
+        resp = confirm(CHAIN, 10, ALLOW_CALLER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "true");
+
+        // Proxy contract allowed but not an owner. Still should block but with differrent error code.
+         block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "proxy",
+                "submit-tx",
+                [],
+                WALLETS[0]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130");
+
+        // Add contract as owner
+        resp =  addOwner(CHAIN, PROXY_CONTRACT,  WALLETS[1]);
+        assertEquals(resp.expectOk(), "u11");
+        resp = confirm(CHAIN, 11, ADD_OWNER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "false");
+        resp = confirm(CHAIN, 11, ADD_OWNER_EXECUTOR, WALLETS[3]);
+        assertEquals(resp.expectOk(), "true");   
+
+        // Now proxy contract can submit a tx
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "proxy",
+                "submit-tx",
+                [],
+                WALLETS[1]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectOk(), "u12");
+
+        // Stop access of the proxy contract
+        resp =  submit(CHAIN, REVOKE_CALLER_EXECUTOR, PROXY_CONTRACT, null, WALLETS[3]);
+        assertEquals(resp.expectOk(), "u13");
+        resp = confirm(CHAIN, 13, REVOKE_CALLER_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "false");
+        resp = confirm(CHAIN, 13, REVOKE_CALLER_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "true");
+
+        // should block
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "proxy",
+                "submit-tx",
+                [],
+                WALLETS[1]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u135");
     }
 }
-
-
 
 Clarinet.test({
     name: "MultiSafe Tests",

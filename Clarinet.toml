@@ -25,6 +25,14 @@ depends_on = ["safe"]
 path = "contracts/executors/set-threshold.clar"
 depends_on = ["safe"]
 
+[contracts.allow-caller]
+path = "contracts/executors/allow-caller.clar"
+depends_on = ["safe"]
+
+[contracts.revoke-caller]
+path = "contracts/executors/revoke-caller.clar"
+depends_on = ["safe"]
+
 [contracts.transfer-stx]
 path = "contracts/executors/transfer-stx.clar"
 depends_on = ["safe"]
@@ -59,6 +67,10 @@ depends_on = []
 
 [contracts.vault]
 path = "contracts/misc/vault.clar"
+depends_on = []
+
+[contracts.proxy]
+path = "contracts/misc/proxy.clar"
 depends_on = []
 
 [contracts.set-vault-token-per-cycle]
