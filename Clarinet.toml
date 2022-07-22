@@ -65,6 +65,10 @@ depends_on = []
 path = "contracts/misc/magic-bridge.clar"
 depends_on = []
 
+[contracts.magic-bridge-fake]
+path = "contracts/misc/magic-bridge-fake.clar"
+depends_on = []
+
 [contracts.vault]
 path = "contracts/misc/vault.clar"
 depends_on = []
