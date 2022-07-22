@@ -11,6 +11,7 @@ const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRT
 const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
 const MAGIC_BRIDGE_SET_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge-set");
 const MAGIC_BRIDGE = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge";
+const MAGIC_BRIDGE_FAKE = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge-fake";
 
 /* Test helpers */
 
@@ -579,6 +580,32 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
         assertEquals(block.receipts[0].result.expectErr(), "u130");
+
+        // Invalid magic bridge address passed. Should revert with ERR-INVALID-MB-ADDRESS
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-escrow-swap",
+                [
+                    types.principal(MAGIC_BRIDGE_FAKE),
+                    types.tuple({header: types.buff("0x21133213"), height: types.uint(1)}),
+                    types.list([]),
+                    types.buff("0x21133213"),
+                    types.tuple({ "tx-index": types.uint(1), hashes: types.list([]), "tree-depth": types.uint(1) }),
+                    types.uint(1),
+                    types.buff("0x21133213"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.uint(1),
+                    types.uint(1)
+
+                ],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u270");
     }
 }
 
