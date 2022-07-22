@@ -1,4 +1,4 @@
-;; Title: Allows a principal to access to a MultiSafe
+;; Title: Allows a principal to access to the safe
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)

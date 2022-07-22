@@ -1,4 +1,4 @@
-;; Title: Stops access of a principal to a MultiSafe
+;; Title: Stops access of a principal to the safe
 ;; Author: Talha Bugra Bulut & Trust Machines
 
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.traits.executor-trait)
