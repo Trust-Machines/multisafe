@@ -651,7 +651,7 @@ const TESTS: Record<string, TestFn> = {
         assertEquals(block.receipts[0].result.expectErr(), "u270"); 
     },
     "testAccessControl": (CHAIN: Chain, WALLETS: string[]) => {
-        // Should block proxy contract.
+        // Should block proxy contract with ERR-ONLY-END-USER
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "proxy",
@@ -670,7 +670,7 @@ const TESTS: Record<string, TestFn> = {
         resp = confirm(CHAIN, 10, ALLOW_CALLER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "true");
 
-        // Proxy contract allowed but not an owner. Still should block but with differrent error code.
+        // Proxy contract allowed but is not an owner. Should revert with ERR-UNAUTHORIZED-SENDER
          block = CHAIN.mineBlock([
             Tx.contractCall(
                 "proxy",
@@ -700,7 +700,7 @@ const TESTS: Record<string, TestFn> = {
         ]);
         assertEquals(block.receipts[0].result.expectOk(), "u12");
 
-        // Stop access of the proxy contract
+        // Revoke the proxy contract
         resp =  submit(CHAIN, REVOKE_CALLER_EXECUTOR, PROXY_CONTRACT, null, WALLETS[3]);
         assertEquals(resp.expectOk(), "u13");
         resp = confirm(CHAIN, 13, REVOKE_CALLER_EXECUTOR, WALLETS[2]);
@@ -708,7 +708,7 @@ const TESTS: Record<string, TestFn> = {
         resp = confirm(CHAIN, 13, REVOKE_CALLER_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "true");
 
-        // should block
+        // Should revert with ERR-ONLY-END-USER
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "proxy",
