@@ -26,18 +26,20 @@ exports[`makeSafeContract mainnet 1`] = `
 (define-constant ERR-OWNER-ALREADY-EXISTS (err u110))
 (define-constant ERR-OWNER-NOT-EXISTS (err u120))
 (define-constant ERR-UNAUTHORIZED-SENDER (err u130))
+(define-constant ERR-ONLY-END-USER (err u135))
 (define-constant ERR-TX-NOT-FOUND (err u140))
 (define-constant ERR-TX-ALREADY-CONFIRMED-BY-OWNER (err u150))
 (define-constant ERR-TX-INVALID-EXECUTOR (err u160))
 (define-constant ERR-INVALID-SAFE (err u170))
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
-(define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
-(define-constant ERR-THRESHOLD-OVERFLOW (err u220))
-(define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
+(define-constant ERR-OWNER-OVERFLOW (err u220))
+(define-constant ERR-THRESHOLD-OVERFLOW (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
+(define-constant ERR-MB-ADDRESS-NOT-SET (err u260))
+(define-constant ERR-INVALID-MB-ADDRESS (err u270))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -45,7 +47,7 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; --- Version
 
 ;; Version string
-(define-constant VERSION \\"0.0.4.alpha\\")
+(define-constant VERSION \\"0.0.5.beta\\")
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
@@ -68,7 +70,12 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; @params owner
 ;; @returns bool
 (define-private (add-owner-internal (owner principal))
-    (var-set owners (unwrap-panic (as-max-len? (append (var-get owners) owner) u20)))
+    (let 
+        (
+           (new-owners (unwrap! (as-max-len? (append (var-get owners) owner) u20) ERR-OWNER-OVERFLOW))
+        )
+        (ok (var-set owners new-owners))
+    )
 )
 
 ;; Adds new owner
@@ -79,7 +86,7 @@ exports[`makeSafeContract mainnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-none (index-of (var-get owners) owner)) ERR-OWNER-ALREADY-EXISTS)
-        (ok (add-owner-internal owner))
+        (add-owner-internal owner)
     )
 )
 
@@ -102,8 +109,7 @@ exports[`makeSafeContract mainnet 1`] = `
         )
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
-        (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
-        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
@@ -112,7 +118,7 @@ exports[`makeSafeContract mainnet 1`] = `
 
 ;; --- Minimum confirmation threshold 
 
-(define-data-var threshold uint u0)
+(define-data-var threshold uint u1)
 
 ;; Returns confirmation threshold
 ;; @returns uint 
@@ -135,8 +141,7 @@ exports[`makeSafeContract mainnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-THRESHOLD-CANT-BE-ZERO)
-        (asserts! (<= value u20) ERR-THRESHOLD-OVERFLOW)
-        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW)
         (ok (set-threshold-internal value))
     )
 )
@@ -159,15 +164,56 @@ exports[`makeSafeContract mainnet 1`] = `
 )
 
 
+;; --- Access control
+
+;; A map to store allowed contract addresses
+(define-map allowed-callers principal bool)
+
+;; Adds an address to allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (allow-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-set allowed-callers caller true))
+  )
+)
+
+;; Removes an address from allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (revoke-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-delete allowed-callers caller))
+  )
+)
+
+;; Returns true if the caller passed in the allowed-callers map 
+;; or its equal to current tx-sender
+;; @returns bool
+(define-read-only (is-allowed-caller (caller principal))
+  (or
+    (match (map-get? allowed-callers caller)
+      value true
+      false
+    )
+    (is-eq tx-sender caller)
+  )
+)
+
 ;; --- Read all basic safe information at once
 
 (define-read-only (get-info)
-    {
+    (ok {
         version: (get-version),
         owners: (get-owners),
         threshold: (get-threshold),
-        nonce: (get-nonce)
-    }
+        nonce: (get-nonce),
+        mb-address: (get-mb-address)
+    })
 )
 
 
@@ -255,6 +301,7 @@ exports[`makeSafeContract mainnet 1`] = `
             (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
             (confirmations (get confirmations tx))
         )
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
         (asserts! (is-some (index-of confirmations tx-sender)) ERR-TX-NOT-CONFIRMED-BY-SENDER)
         (var-set rem-confirmation tx-sender)
@@ -281,6 +328,7 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -324,6 +372,7 @@ exports[`makeSafeContract mainnet 1`] = `
 ;; @returns (response uint)
 (define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -337,12 +386,35 @@ exports[`makeSafeContract mainnet 1`] = `
 
 ;; --- Magic Bridge integration
 
+;; Magic Bridge contract address. 
+;; By default address of deployed safe to be able to use none-optional principal.
+(define-data-var mb-address principal SELF)
+
+;; Updates magic bridge contract address
+;; @restricted to SELF
+;; @params address
+;; @returns (response bool)
+(define-public (set-mb-address (address principal))
+    (begin
+        (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+        (ok (var-set mb-address address))
+    )
+)
+
+;; Returns magic bridge contract address 
+;; @returns principal
+(define-read-only (get-mb-address)
+ (var-get mb-address)
+)
+
 ;; Registers the safe as a swapper to Magic Bridge.
 ;; @restricted to owners
 ;; @params bridge ; contract address of Magic Bridge
 ;; @returns (response bool)
 (define-public (mb-initialize-swapper (bridge <magic-bridge-trait>))
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge initialize-swapper)))
         (ok true)
@@ -383,6 +455,8 @@ exports[`makeSafeContract mainnet 1`] = `
     (min-to-receive uint)
   )
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge escrow-swap block prev-blocks tx proof output-index sender recipient expiration-buff hash swapper-buff supplier-id min-to-receive)))
         (ok true)
@@ -433,18 +507,20 @@ exports[`makeSafeContract testnet 1`] = `
 (define-constant ERR-OWNER-ALREADY-EXISTS (err u110))
 (define-constant ERR-OWNER-NOT-EXISTS (err u120))
 (define-constant ERR-UNAUTHORIZED-SENDER (err u130))
+(define-constant ERR-ONLY-END-USER (err u135))
 (define-constant ERR-TX-NOT-FOUND (err u140))
 (define-constant ERR-TX-ALREADY-CONFIRMED-BY-OWNER (err u150))
 (define-constant ERR-TX-INVALID-EXECUTOR (err u160))
 (define-constant ERR-INVALID-SAFE (err u170))
 (define-constant ERR-TX-CONFIRMED (err u180))
 (define-constant ERR-TX-NOT-CONFIRMED-BY-SENDER (err u190))
-(define-constant ERR-AT-LEAST-ONE-OWNER-REQUIRED (err u200))
 (define-constant ERR-THRESHOLD-CANT-BE-ZERO (err u210))
-(define-constant ERR-THRESHOLD-OVERFLOW (err u220))
-(define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
+(define-constant ERR-OWNER-OVERFLOW (err u220))
+(define-constant ERR-THRESHOLD-OVERFLOW (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
+(define-constant ERR-MB-ADDRESS-NOT-SET (err u260))
+(define-constant ERR-INVALID-MB-ADDRESS (err u270))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -452,7 +528,7 @@ exports[`makeSafeContract testnet 1`] = `
 ;; --- Version
 
 ;; Version string
-(define-constant VERSION \\"0.0.4.alpha\\")
+(define-constant VERSION \\"0.0.5.beta\\")
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
@@ -475,7 +551,12 @@ exports[`makeSafeContract testnet 1`] = `
 ;; @params owner
 ;; @returns bool
 (define-private (add-owner-internal (owner principal))
-    (var-set owners (unwrap-panic (as-max-len? (append (var-get owners) owner) u20)))
+    (let 
+        (
+           (new-owners (unwrap! (as-max-len? (append (var-get owners) owner) u20) ERR-OWNER-OVERFLOW))
+        )
+        (ok (var-set owners new-owners))
+    )
 )
 
 ;; Adds new owner
@@ -486,7 +567,7 @@ exports[`makeSafeContract testnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-none (index-of (var-get owners) owner)) ERR-OWNER-ALREADY-EXISTS)
-        (ok (add-owner-internal owner))
+        (add-owner-internal owner)
     )
 )
 
@@ -509,8 +590,7 @@ exports[`makeSafeContract testnet 1`] = `
         )
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (is-some (index-of owners-list owner)) ERR-OWNER-NOT-EXISTS)
-        (asserts! (> (len owners-list) u1) ERR-AT-LEAST-ONE-OWNER-REQUIRED)
-        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (asserts! (>= (- (len owners-list) u1) (var-get threshold)) ERR-THRESHOLD-OVERFLOW)
         (var-set rem-owner owner)
         (ok (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter owners-list) u20))))
     )
@@ -519,7 +599,7 @@ exports[`makeSafeContract testnet 1`] = `
 
 ;; --- Minimum confirmation threshold 
 
-(define-data-var threshold uint u0)
+(define-data-var threshold uint u1)
 
 ;; Returns confirmation threshold
 ;; @returns uint 
@@ -542,8 +622,7 @@ exports[`makeSafeContract testnet 1`] = `
     (begin
         (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
         (asserts! (> value u0) ERR-THRESHOLD-CANT-BE-ZERO)
-        (asserts! (<= value u20) ERR-THRESHOLD-OVERFLOW)
-        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW-OWNERS)
+        (asserts! (<= value (len (var-get owners))) ERR-THRESHOLD-OVERFLOW)
         (ok (set-threshold-internal value))
     )
 )
@@ -566,15 +645,56 @@ exports[`makeSafeContract testnet 1`] = `
 )
 
 
+;; --- Access control
+
+;; A map to store allowed contract addresses
+(define-map allowed-callers principal bool)
+
+;; Adds an address to allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (allow-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-set allowed-callers caller true))
+  )
+)
+
+;; Removes an address from allowed-callers map
+;; @restricted to SELF
+;; @params principal
+;; @returns (response bool)
+(define-public (revoke-caller (caller principal))
+  (begin
+    (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+    (ok (map-delete allowed-callers caller))
+  )
+)
+
+;; Returns true if the caller passed in the allowed-callers map 
+;; or its equal to current tx-sender
+;; @returns bool
+(define-read-only (is-allowed-caller (caller principal))
+  (or
+    (match (map-get? allowed-callers caller)
+      value true
+      false
+    )
+    (is-eq tx-sender caller)
+  )
+)
+
 ;; --- Read all basic safe information at once
 
 (define-read-only (get-info)
-    {
+    (ok {
         version: (get-version),
         owners: (get-owners),
         threshold: (get-threshold),
-        nonce: (get-nonce)
-    }
+        nonce: (get-nonce),
+        mb-address: (get-mb-address)
+    })
 )
 
 
@@ -662,6 +782,7 @@ exports[`makeSafeContract testnet 1`] = `
             (tx (unwrap! (map-get? transactions tx-id) ERR-TX-NOT-FOUND))
             (confirmations (get confirmations tx))
         )
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-eq (get confirmed tx) false) ERR-TX-CONFIRMED)
         (asserts! (is-some (index-of confirmations tx-sender)) ERR-TX-NOT-CONFIRMED-BY-SENDER)
         (var-set rem-confirmation tx-sender)
@@ -688,6 +809,7 @@ exports[`makeSafeContract testnet 1`] = `
 ;; @returns (response bool)
 (define-public (confirm (tx-id uint) (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>))
     (begin
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -731,6 +853,7 @@ exports[`makeSafeContract testnet 1`] = `
 ;; @returns (response uint)
 (define-public (submit (executor <executor-trait>) (safe <safe-trait>) (param-ft <ft-trait>) (param-nft <nft-trait>) (param-p (optional principal)) (param-u (optional uint)) (param-b (optional (buff 20))))
     (begin
+        (asserts! (is-allowed-caller contract-caller) ERR-ONLY-END-USER)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (asserts! (is-eq (contract-of safe) SELF) ERR-INVALID-SAFE) 
         (let
@@ -744,12 +867,35 @@ exports[`makeSafeContract testnet 1`] = `
 
 ;; --- Magic Bridge integration
 
+;; Magic Bridge contract address. 
+;; By default address of deployed safe to be able to use none-optional principal.
+(define-data-var mb-address principal SELF)
+
+;; Updates magic bridge contract address
+;; @restricted to SELF
+;; @params address
+;; @returns (response bool)
+(define-public (set-mb-address (address principal))
+    (begin
+        (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+        (ok (var-set mb-address address))
+    )
+)
+
+;; Returns magic bridge contract address 
+;; @returns principal
+(define-read-only (get-mb-address)
+ (var-get mb-address)
+)
+
 ;; Registers the safe as a swapper to Magic Bridge.
 ;; @restricted to owners
 ;; @params bridge ; contract address of Magic Bridge
 ;; @returns (response bool)
 (define-public (mb-initialize-swapper (bridge <magic-bridge-trait>))
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge initialize-swapper)))
         (ok true)
@@ -790,6 +936,8 @@ exports[`makeSafeContract testnet 1`] = `
     (min-to-receive uint)
   )
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge escrow-swap block prev-blocks tx proof output-index sender recipient expiration-buff hash swapper-buff supplier-id min-to-receive)))
         (ok true)
