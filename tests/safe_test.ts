@@ -9,6 +9,8 @@ const ADD_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRT
 const REMOVE_OWNER_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.remove-owner");
 const THRESHOLD_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.set-threshold");
 const TRANSFER_STX_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.transfer-stx");
+const MAGIC_BRIDGE_SET_EXECUTOR = types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge-set");
+const MAGIC_BRIDGE = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge";
 
 /* Test helpers */
 
@@ -432,6 +434,7 @@ const TESTS: Record<string, TestFn> = {
         assertEquals(json.owners !== undefined, true);
         assertEquals(json["threshold"] !== undefined, true);
         assertEquals(json.nonce !== undefined, true);
+        assertEquals(json["mb-address"] !== undefined, true);
     },
     "testRevoke": (CHAIN: Chain, WALLETS: string[]) => {
         // Tx not exists.
@@ -496,22 +499,68 @@ const TESTS: Record<string, TestFn> = {
         assertEquals(resp.expectErr(), "u230");
     },
     "testMagicBridgeFnTests": (CHAIN: Chain, WALLETS: string[]) => {
+
+        // magic bridge address not set
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
                 "mb-initialize-swapper",
-                [types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge")],
+                [types.principal(MAGIC_BRIDGE)],
                 WALLETS[6]
             ),
         ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u130");
+        assertEquals(block.receipts[0].result.expectErr(), "u260"); 
 
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
                 "mb-escrow-swap",
                 [
-                    types.principal("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.magic-bridge"),
+                    types.principal(MAGIC_BRIDGE),
+                    types.tuple({header: types.buff("0x21133213"), height: types.uint(1)}),
+                    types.list([]),
+                    types.buff("0x21133213"),
+                    types.tuple({ "tx-index": types.uint(1), hashes: types.list([]), "tree-depth": types.uint(1) }),
+                    types.uint(1),
+                    types.buff("0x21133213"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.buff("0x21133213"),
+                    types.buff("0x21"),
+                    types.uint(1),
+                    types.uint(1)
+
+                ],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u260"); 
+
+        // Set magic bridge address with owner confirmations
+        let resp =  submit(CHAIN, MAGIC_BRIDGE_SET_EXECUTOR, MAGIC_BRIDGE, null, WALLETS[3]);
+        assertEquals(resp.expectOk(), "u9");
+        resp = confirm(CHAIN, 9, MAGIC_BRIDGE_SET_EXECUTOR, WALLETS[2]);
+        assertEquals(resp.expectOk(), "false");
+        resp = confirm(CHAIN, 9, MAGIC_BRIDGE_SET_EXECUTOR, WALLETS[1]);
+        assertEquals(resp.expectOk(), "true");
+
+        // It should pass ERR-INVALID-MB-ADDRESS check and fail at ERR-UNAUTHORIZED-SENDER
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-initialize-swapper",
+                [types.principal(MAGIC_BRIDGE)],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u130"); 
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
+                "mb-escrow-swap",
+                [
+                    types.principal(MAGIC_BRIDGE),
                     types.tuple({header: types.buff("0x21133213"), height: types.uint(1)}),
                     types.list([]),
                     types.buff("0x21133213"),

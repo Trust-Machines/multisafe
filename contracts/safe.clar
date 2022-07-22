@@ -35,6 +35,8 @@
 (define-constant ERR-THRESHOLD-OVERFLOW-OWNERS (err u230))
 (define-constant ERR-TX-INVALID-FT (err u240))
 (define-constant ERR-TX-INVALID-NFT (err u250))
+(define-constant ERR-MB-ADDRESS-NOT-SET (err u260))
+(define-constant ERR-INVALID-MB-ADDRESS (err u270))
 
 ;; Principal of deployed contract
 (define-constant SELF (as-contract tx-sender))
@@ -163,7 +165,8 @@
         version: (get-version),
         owners: (get-owners),
         threshold: (get-threshold),
-        nonce: (get-nonce)
+        nonce: (get-nonce),
+        mb-address: (get-mb-address)
     }
 )
 
@@ -334,12 +337,35 @@
 
 ;; --- Magic Bridge integration
 
+;; Magic Bridge contract address. 
+;; By default principal of deployed contract to be able to use none-optional principal.
+(define-data-var mb-address principal SELF)
+
+;; Updates magic bridge contract address
+;; @restricted to SELF
+;; @params address
+;; @returns (response bool)
+(define-public (set-mb-address (address principal))
+    (begin
+        (asserts! (is-eq tx-sender SELF) ERR-CALLER-MUST-BE-SELF)
+        (ok (var-set mb-address address))
+    )
+)
+
+;; Returns magic bridge contract address 
+;; @returns principal
+(define-read-only (get-mb-address)
+ (var-get mb-address)
+)
+
 ;; Registers the safe as a swapper to Magic Bridge.
 ;; @restricted to owners
 ;; @params bridge ; contract address of Magic Bridge
 ;; @returns (response bool)
 (define-public (mb-initialize-swapper (bridge <magic-bridge-trait>))
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge initialize-swapper)))
         (ok true)
@@ -380,6 +406,8 @@
     (min-to-receive uint)
   )
     (begin
+        (asserts! (not (is-eq (var-get mb-address) SELF)) ERR-MB-ADDRESS-NOT-SET)
+        (asserts! (is-eq (contract-of bridge) (var-get mb-address)) ERR-INVALID-MB-ADDRESS)
         (asserts! (is-some (index-of (var-get owners) tx-sender)) ERR-UNAUTHORIZED-SENDER)
         (try! (as-contract (contract-call? bridge escrow-swap block prev-blocks tx proof output-index sender recipient expiration-buff hash swapper-buff supplier-id min-to-receive)))
         (ok true)

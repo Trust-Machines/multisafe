@@ -6,6 +6,7 @@
 		(add-owner (principal) (response bool uint))
 		(remove-owner (principal) (response bool uint))
 		(set-threshold (uint) (response bool uint))
+		(set-mb-address (principal) (response bool uint))
 	)
 )
 
