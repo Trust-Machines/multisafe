@@ -44,7 +44,7 @@
 ;; --- Version
 
 ;; Version string
-(define-constant VERSION "0.0.4.alpha")
+(define-constant VERSION "0.0.5.beta")
 
 ;; Returns version of the safe contract
 ;; @returns string-ascii
