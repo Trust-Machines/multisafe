@@ -204,13 +204,13 @@
 ;; --- Read all basic safe information at once
 
 (define-read-only (get-info)
-    {
+    (ok {
         version: (get-version),
         owners: (get-owners),
         threshold: (get-threshold),
         nonce: (get-nonce),
         mb-address: (get-mb-address)
-    }
+    })
 )
 
 

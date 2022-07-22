@@ -9,6 +9,7 @@
 		(allow-caller (principal) (response bool uint))
 		(revoke-caller (principal) (response bool uint))
 		(set-mb-address (principal) (response bool uint))
+		(get-info () (response {version: (string-ascii 20), owners: (list 20 principal), threshold: uint, nonce: uint, mb-address: principal} uint))
 	)
 )
 

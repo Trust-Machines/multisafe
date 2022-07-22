@@ -462,7 +462,7 @@ const TESTS: Record<string, TestFn> = {
             ),
         ]);
 
-        const json = JSON.parse(JSON.stringify(block.receipts[0].result.expectTuple()));
+        const json = JSON.parse(JSON.stringify(block.receipts[0].result.expectOk().expectTuple()));
         assertEquals(json.version !== undefined, true);
         assertEquals(json.owners !== undefined, true);
         assertEquals(json["threshold"] !== undefined, true);
