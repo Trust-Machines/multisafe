@@ -534,7 +534,7 @@ const TESTS: Record<string, TestFn> = {
     },
     "testMagicBridgeFnTests": (CHAIN: Chain, WALLETS: string[]) => {
 
-        // magic bridge address not set
+        // Magic bridge address is not set. Should revert with ERR-MB-ADDRESS-NOT-SET
         let block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -571,18 +571,14 @@ const TESTS: Record<string, TestFn> = {
         assertEquals(block.receipts[0].result.expectErr(), "u260"); 
 
         // Set magic bridge address with owner confirmations
-
         let resp =  submit(CHAIN, MAGIC_BRIDGE_SET_EXECUTOR, MAGIC_BRIDGE, null, WALLETS[3]);
         assertEquals(resp.expectOk(), "u9");
-
         resp = confirm(CHAIN, 9, MAGIC_BRIDGE_SET_EXECUTOR, WALLETS[2]);
         assertEquals(resp.expectOk(), "false");
-
         resp = confirm(CHAIN, 9, MAGIC_BRIDGE_SET_EXECUTOR, WALLETS[1]);
         assertEquals(resp.expectOk(), "true");
 
-        
-        // It should pass ERR-INVALID-MB-ADDRESS check and fail at ERR-UNAUTHORIZED-SENDER
+        // It should pass ERR-INVALID-MB-ADDRESS check and revert at ERR-UNAUTHORIZED-SENDER
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
@@ -622,6 +618,16 @@ const TESTS: Record<string, TestFn> = {
         block = CHAIN.mineBlock([
             Tx.contractCall(
                 "safe",
+                "mb-initialize-swapper",
+                [types.principal(MAGIC_BRIDGE_FAKE)],
+                WALLETS[6]
+            ),
+        ]);
+        assertEquals(block.receipts[0].result.expectErr(), "u270"); 
+
+        block = CHAIN.mineBlock([
+            Tx.contractCall(
+                "safe",
                 "mb-escrow-swap",
                 [
                     types.principal(MAGIC_BRIDGE_FAKE),
@@ -642,7 +648,7 @@ const TESTS: Record<string, TestFn> = {
                 WALLETS[6]
             ),
         ]);
-        assertEquals(block.receipts[0].result.expectErr(), "u270");
+        assertEquals(block.receipts[0].result.expectErr(), "u270"); 
     },
     "testAccessControl": (CHAIN: Chain, WALLETS: string[]) => {
         // Should block proxy contract.

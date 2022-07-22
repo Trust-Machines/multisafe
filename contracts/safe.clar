@@ -384,7 +384,7 @@
 ;; --- Magic Bridge integration
 
 ;; Magic Bridge contract address. 
-;; By default principal of deployed contract to be able to use none-optional principal.
+;; By default address of deployed safe to be able to use none-optional principal.
 (define-data-var mb-address principal SELF)
 
 ;; Updates magic bridge contract address
