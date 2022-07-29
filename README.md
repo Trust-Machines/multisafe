@@ -19,9 +19,7 @@ Future updates (coming soon):
 
 ## Security
 
-* Please be aware that the code hasn't been audited by an independent security team. Use at your own risk. 
-* We are planning a security audit for June 2022
-* We would love your help testing our code. Please report any bugs as a Github issue. 
+See CoinFabrik audit report [here](https://github.com/Trust-Machines/multisafe/blob/main/audit/Trust-Machines-MS-Audit(2022-07).pdf).
 
 ## Clarity Usage  
 
