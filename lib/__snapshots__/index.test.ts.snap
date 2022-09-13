@@ -1,26 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getDeployer 1`] = `
-Object {
-  "mainnet": "SP34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C7DQNKAD",
-  "testnet": "ST34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C67SRCB0",
-}
-`;
-
-exports[`getDeployer 2`] = `
-Object {
-  "mainnet": "SP34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C7DQNKAD",
-  "testnet": "ST34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C67SRCB0",
-}
-`;
-
-exports[`getDeployer 3`] = `
-Object {
-  "mainnet": "SP282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5ZAS3B6",
-  "testnet": "ST282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5Z0WEM5",
-}
-`;
-
 exports[`makeSafeContract mainnet 1`] = `
 ";; Title: MultiSafe
 ;; Author: Talha Bugra Bulut & Trust Machines

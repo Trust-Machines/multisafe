@@ -18,18 +18,6 @@ export const DEPLOYERS = [
     "ST282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5Z0WEM5"
 ]
 
-export const getDeployer = (version: string): Record<NETWORK, string> => {
-    const [_, __, minor] = version.split('.');
-    if (Number(minor) >= 5) {
-        return DEPLOYER;
-    }
-
-    return {
-        mainnet: "SP34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C7DQNKAD",
-        testnet: "ST34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C67SRCB0"
-    }
-}
-
 export const MAGIC_BRIDGE: Record<NETWORK, string> = {
     mainnet: "",
     testnet: "ST2ZTY9KK9H0FA0NVN3K8BGVN6R7GYVFG6BE7TAR1.bridge"
