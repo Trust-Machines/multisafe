@@ -6,7 +6,7 @@ export const DEPLOYER: Record<NETWORK, string> = {
     testnet: "ST282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5Z0WEM5"
 }
 
-// A list of all deployer adresses we used. Helps to determine transaction types with the frontend app.
+// A list of all deployer addresses we used. Helps to determine transaction types with the frontend app.
 export const DEPLOYERS = [
     "SP1Z5Z68R05X2WKSSPQ0QN0VYPB1902884KPDJVNF",
     "ST1Z5Z68R05X2WKSSPQ0QN0VYPB1902884H6197BB",
@@ -17,6 +17,18 @@ export const DEPLOYERS = [
     "SP282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5ZAS3B6",
     "ST282BC63F7JNK71YCF7HZHZZ2T9S9P3BN5Z0WEM5"
 ]
+
+export const getDeployer = (version: string): Record<NETWORK, string> => {
+    const [_, __, minor] = version.split('.');
+    if (Number(minor) >= 5) {
+        return DEPLOYER;
+    }
+
+    return {
+        mainnet: "SP34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C7DQNKAD",
+        testnet: "ST34V5RC8C7E1F0GQS20JKV9PRYR10XZ9C67SRCB0"
+    }
+}
 
 export const MAGIC_BRIDGE: Record<NETWORK, string> = {
     mainnet: "",
