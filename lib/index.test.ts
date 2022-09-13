@@ -1,5 +1,5 @@
 import fs from "fs";
-import { makeSafeContract } from "./index";
+import { makeSafeContract, getDeployer } from "./index";
 
 test("makeSafeContract mainnet", () => {
     const code = fs.readFileSync("contracts/safe.clar", { encoding: "utf-8" });
@@ -40,3 +40,8 @@ test("Threshold can't be higher than owner count", () => {
     }
 });
 
+test("getDeployer", () => {
+    expect(getDeployer("0.0.1.alpha")).toMatchSnapshot();
+    expect(getDeployer("0.0.3.alpha")).toMatchSnapshot();
+    expect(getDeployer("0.0.5.beta")).toMatchSnapshot();
+});
