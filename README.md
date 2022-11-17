@@ -10,11 +10,11 @@ https://app.multisafe.xyz/
 
 Current supported features: 
 - Send, transfer and hold STX
+- SIP-009 Non-fungible token and SIP-010 Fungible token support 
 - Supports up to 20 owners
 
 Future updates (coming soon): 
 - User-friendly app 
-- SIP-009 Non-fungible token and SIP-010 Fungible token support 
 - Native Bitcoin (BTC) support
 
 ## Security
