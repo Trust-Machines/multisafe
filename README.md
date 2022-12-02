@@ -24,6 +24,8 @@ Future updates (coming soon):
 [Least Authority audit report](https://github.com/Trust-Machines/multisafe/blob/main/audit/LeastAuthority.pdf)
 
 
+Please report any security issues you find via our bug bounty program on [Immunefi](https://immunefi.com/bounty/multisafe/).
+
 ## Clarity Usage  
 
 ### Requires Clarinet 
