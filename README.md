@@ -19,7 +19,10 @@ Future updates (coming soon):
 
 ## Security
 
-See CoinFabrik audit report [here](https://github.com/Trust-Machines/multisafe/blob/main/audit/Trust-Machines-MS-Audit(2022-07).pdf).
+[CoinFabrik audit report](https://github.com/Trust-Machines/multisafe/blob/main/audit/CoinFabrik.pdf)
+
+[Least Authority audit report](https://github.com/Trust-Machines/multisafe/blob/main/audit/LeastAuthority.pdf)
+
 
 ## Clarity Usage  
 
